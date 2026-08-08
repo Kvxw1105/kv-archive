@@ -1,9 +1,13 @@
 # KV Archive Current State
 
 Baseline version: `0.16.11`  
-Engineering state: `LOCALLY_VERIFIED`  
+Engineering state: `CI_PASSED`  
 Transition node: `GITHUB_AND_LOCAL_AGENT_HANDOFF_READY`  
-Date: `2026-08-09`
+Date: `2026-08-09`  
+Repository: `https://github.com/Kvxw1105/kv-archive` (public, branch `main`)  
+Baseline commit: `6d1028eb7b678147f59f0d6d303da5495fd2e399`  
+CI run: `31276928345` — https://github.com/Kvxw1105/kv-archive/actions/runs/31276928345  
+Release: `v0.16.11` pre-release — https://github.com/Kvxw1105/kv-archive/releases/tag/v0.16.11
 
 ## Verified baseline facts
 
@@ -46,8 +50,8 @@ The long ChatGPT web conversation is no longer the primary coding workspace. The
 
 - EDITED: handoff/governance seed prepared outside Git history.
 - LOCALLY_VERIFIED: prepared GitHub seed revalidated: npm ci PASS, typecheck PASS, 294/294 tests PASS, 7/7 performance gates PASS.
-- COMMITTED: no.
-- PUSHED: no.
-- PR_UPDATED: no.
-- CI_PASSED: no.
-- RELEASED: no.
+- COMMITTED: yes — baseline commit `6d1028e` on `main`.
+- PUSHED: yes — https://github.com/Kvxw1105/kv-archive
+- PR_UPDATED: n/a (initial baseline import; follow-up changes use branch/PR).
+- CI_PASSED: yes — run `31276928345` green on baseline SHA.
+- RELEASED: `v0.16.11` pre-release created (owner-profile acceptance still pending).

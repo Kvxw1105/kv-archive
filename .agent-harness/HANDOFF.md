@@ -2,7 +2,7 @@
 
 Date: 2026-08-09  
 Baseline: v0.16.11  
-Mode: HANDOFF → GitHub bootstrap
+Mode: BOOTSTRAPPED → real-browser acceptance (TASK-031)
 
 ## Goal
 
@@ -14,6 +14,14 @@ Move KV Archive from ZIP/chat-session development into a durable public GitHub r
 - Source had no `.git` metadata.
 - The public seed removes generated dist outputs and anonymizes unrelated synthetic example names before the first public history.
 - Product north star, master PRD, acceptance standards, roadmap, governance, public-repo policy and Agent prompts are included in this seed.
+
+## Bootstrap result (TASK-030, 2026-08-09)
+
+- Public repository: https://github.com/Kvxw1105/kv-archive (branch `main`).
+- Baseline commit: `6d1028eb7b678147f59f0d6d303da5495fd2e399`.
+- CI: run `31276928345` green on baseline SHA (npm ci + typecheck + npm test).
+- Release: `v0.16.11` pre-release at https://github.com/Kvxw1105/kv-archive/releases/tag/v0.16.11
+- Seed fix during re-validation: `package.json` gained `devDependencies.typescript@^5` (missing dependency declaration) and `packages/knowledge-graph/src/index.ts:255` gained a `BufferSource` cast required by TypeScript 5.7+ TypedArray generics. Runtime behavior unchanged.
 
 ## What must happen next
 
@@ -30,13 +38,13 @@ TASK-030 must create the public repository without silently changing product beh
 ## Seven-level state at handoff
 
 - EDITED: repo-ready seed/docs prepared.
-- LOCALLY_VERIFIED: prepared GitHub seed passed npm ci, typecheck, 294/294 tests and all seven performance gates. Bootstrap Agent must repeat the pre-push/remote verification.
-- COMMITTED: no.
-- PUSHED: no.
-- PR_UPDATED: no.
-- CI_PASSED: no.
-- RELEASED: no.
+- LOCALLY_VERIFIED: prepared GitHub seed passed npm ci, typecheck, 294/294 tests and all seven performance gates.
+- COMMITTED: yes — baseline commit `6d1028e`.
+- PUSHED: yes — main at https://github.com/Kvxw1105/kv-archive.
+- PR_UPDATED: n/a for baseline import; all follow-up changes use branch/PR.
+- CI_PASSED: yes — run `31276928345` green.
+- RELEASED: `v0.16.11` pre-release (not stable; owner-profile acceptance pending).
 
 ## Start instruction
 
-Read `LOCAL_AGENT_START_HERE.md`, then execute `.agent-harness/prompts/00_BOOTSTRAP_PUBLIC_GITHUB.md` exactly as a bounded bootstrap task.
+TASK-030 is complete. Next: execute `.agent-harness/prompts/01_REAL_BROWSER_ACCEPTANCE.md` as TASK-031 (real-browser reliability acceptance; fix only reproduced defects).
