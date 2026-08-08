@@ -1,0 +1,535 @@
+/* KV Archive v0.16.7 visibility hardening layer.
+   Loaded after page and theme styles so contrast and type remain readable. */
+:root {
+  --kv-surface: var(--kv-panel);
+  --kv-elevated: var(--kv-panel-raised);
+  --kv-border: var(--kv-line);
+  --kv-font-label: 12px;
+  --kv-font-control: 14px;
+  --kv-font-body: 15px;
+}
+
+:root[data-theme="dark"] {
+  --kv-text: #f8f7f2;
+  --kv-muted: #c3c9c0;
+  --kv-faint: #a3aba1;
+  --text: #f8f7f2;
+  --muted: #c3c9c0;
+  --faint: #a3aba1;
+  --kv-line: rgba(239, 244, 237, .18);
+  --kv-line-strong: rgba(239, 244, 237, .3);
+  --line: rgba(239, 244, 237, .18);
+  --line-strong: rgba(239, 244, 237, .3);
+  --kv-accent: #9bd3b9;
+  --kv-accent-strong: #d6efe2;
+  --accent: #9bd3b9;
+  --kv-primary-bg: #edf1ec;
+  --kv-primary-text: #101712;
+  --kv-secondary-bg: #29322b;
+  --kv-secondary-text: #f7f8f4;
+  --kv-secondary-border: #59665d;
+  --kv-ghost-bg: #1d231e;
+  --kv-ghost-text: #e0e5de;
+  --kv-ghost-border: #465149;
+  --kv-disabled-bg: #252a26;
+  --kv-disabled-text: #a4aba2;
+  --kv-disabled-border: #465049;
+  --kv-control: #111611;
+  --kv-control-hover: #171e18;
+  --kv-control-border: #59665d;
+  --kv-danger: #aa4b44;
+  --kv-on-danger: #fffaf8;
+  --kv-good-readable: #a8dfc4;
+  --kv-warn-readable: #efd18d;
+  --kv-danger-readable: #ffb6ad;
+}
+
+:root[data-theme="light"] {
+  --kv-text: #142019;
+  --kv-muted: #44534a;
+  --kv-faint: #59685f;
+  --text: #142019;
+  --muted: #44534a;
+  --faint: #59685f;
+  --kv-line: rgba(28, 48, 36, .22);
+  --kv-line-strong: rgba(28, 48, 36, .36);
+  --line: rgba(28, 48, 36, .22);
+  --line-strong: rgba(28, 48, 36, .36);
+  --kv-accent: #285c49;
+  --kv-accent-strong: #173f31;
+  --accent: #285c49;
+  --kv-primary-bg: #214d3d;
+  --kv-primary-text: #ffffff;
+  --kv-secondary-bg: #e2e9e4;
+  --kv-secondary-text: #17241b;
+  --kv-secondary-border: #9aa99e;
+  --kv-ghost-bg: #f0f3f0;
+  --kv-ghost-text: #263a2f;
+  --kv-ghost-border: #a7b4ab;
+  --kv-disabled-bg: #e1e5e2;
+  --kv-disabled-text: #5d675f;
+  --kv-disabled-border: #b8c1bb;
+  --kv-control: #ffffff;
+  --kv-control-hover: #ffffff;
+  --kv-control-border: #83958a;
+  --kv-danger: #9b403a;
+  --kv-on-danger: #ffffff;
+  --kv-good-readable: #245f48;
+  --kv-warn-readable: #765514;
+  --kv-danger-readable: #8b302b;
+}
+
+/* Base readability */
+:root[data-theme] body {
+  font-size: var(--kv-font-body);
+  line-height: 1.62;
+}
+:root[data-theme] button,
+:root[data-theme] .button,
+:root[data-theme] .button-link,
+:root[data-theme] .import-button,
+:root[data-theme] input,
+:root[data-theme] select,
+:root[data-theme] textarea {
+  font-size: var(--kv-font-control);
+  line-height: 1.35;
+}
+:root[data-theme] button,
+:root[data-theme] .button,
+:root[data-theme] .button-link,
+:root[data-theme] .import-button {
+  min-height: 44px;
+  font-weight: 750;
+}
+:root[data-theme] select,
+:root[data-theme] input:not([type]),
+:root[data-theme] input[type="text"],
+:root[data-theme] input[type="search"],
+:root[data-theme] input[type="date"],
+:root[data-theme] input[type="time"],
+:root[data-theme] input[type="number"],
+:root[data-theme] textarea {
+  border-color: var(--kv-control-border);
+  background: var(--kv-control);
+  color: var(--kv-text);
+}
+:root[data-theme] select option { background: var(--kv-panel-raised); color: var(--kv-text); }
+:root[data-theme] input::placeholder,
+:root[data-theme] textarea::placeholder { color: var(--kv-faint); opacity: 1; }
+
+/* Primary, secondary, ghost, dangerous and disabled controls have explicit pairs. */
+:root[data-theme] button,
+:root[data-theme] .button,
+:root[data-theme] .button-link,
+:root[data-theme] .import-button,
+:root[data-theme] button.primary,
+:root[data-theme] .primary-action {
+  background: var(--kv-primary-bg);
+  color: var(--kv-primary-text);
+  border-color: color-mix(in srgb, var(--kv-primary-bg) 72%, var(--kv-line-strong));
+}
+:root[data-theme] button.secondary,
+:root[data-theme] .secondary,
+:root[data-theme] .secondary-action,
+:root[data-theme] .icon-button,
+:root[data-theme] .text-button,
+:root[data-theme] .close {
+  background: var(--kv-secondary-bg);
+  color: var(--kv-secondary-text);
+  border-color: var(--kv-secondary-border);
+}
+:root[data-theme] button.ghost,
+:root[data-theme] .ghost,
+:root[data-theme] .button.ghost,
+:root[data-theme] .button-link.ghost,
+:root[data-theme] .text-action,
+:root[data-theme] .selected-item button,
+:root[data-theme] .item-actions button,
+:root[data-theme] .gate-run button,
+:root[data-theme] .card-actions button,
+:root[data-theme] .nav-item,
+:root[data-theme] .theme-cycle-button {
+  background: var(--kv-ghost-bg);
+  color: var(--kv-ghost-text);
+  border-color: var(--kv-ghost-border);
+}
+:root[data-theme] button.danger,
+:root[data-theme] .danger {
+  background: var(--kv-danger);
+  color: var(--kv-on-danger);
+  border-color: color-mix(in srgb, var(--kv-danger) 78%, #000);
+}
+:root[data-theme] button:disabled,
+:root[data-theme] .button[aria-disabled="true"],
+:root[data-theme] .button-link[aria-disabled="true"] {
+  opacity: 1;
+  background: var(--kv-disabled-bg) !important;
+  color: var(--kv-disabled-text) !important;
+  border-color: var(--kv-disabled-border) !important;
+  box-shadow: none !important;
+  cursor: not-allowed;
+}
+:root[data-theme] button:hover:not(:disabled),
+:root[data-theme] .button:hover,
+:root[data-theme] .button-link:hover,
+:root[data-theme] .import-button:hover {
+  filter: brightness(1.035);
+}
+
+/* Card-like buttons must not inherit primary-button colors. */
+:root[data-theme] .result,
+:root[data-theme] .quick-action,
+:root[data-theme] .destination {
+  background: linear-gradient(180deg, var(--kv-overlay-subtle), transparent), var(--kv-panel);
+  color: var(--kv-text);
+  border-color: var(--kv-line-strong);
+}
+:root[data-theme] .result:hover,
+:root[data-theme] .quick-action:hover,
+:root[data-theme] .destination:hover {
+  background: color-mix(in srgb, var(--kv-accent) 8%, var(--kv-panel));
+  color: var(--kv-text);
+  border-color: color-mix(in srgb, var(--kv-accent) 48%, var(--kv-line-strong));
+}
+
+/* Functional copy may not drop into decorative 8–10px sizes. */
+:root[data-theme] .brand-note,
+:root[data-theme] .rail-label,
+:root[data-theme] .rail-index,
+:root[data-theme] .rail-subtitle,
+:root[data-theme] .eyebrow,
+:root[data-theme] .kicker,
+:root[data-theme] .phase,
+:root[data-theme] .head-status,
+:root[data-theme] .metrics span,
+:root[data-theme] .summary span,
+:root[data-theme] .metric span,
+:root[data-theme] .schedule-grid label,
+:root[data-theme] .manual-backup-options label,
+:root[data-theme] .filters label,
+:root[data-theme] .controlbar label,
+:root[data-theme] .result .meta,
+:root[data-theme] .result-guide,
+:root[data-theme] .message header,
+:root[data-theme] .panel-mark,
+:root[data-theme] .version,
+:root[data-theme] .pill,
+:root[data-theme] .state-meta span,
+:root[data-theme] .conversation-badge,
+:root[data-theme] .item-meta,
+:root[data-theme] .log li::before,
+:root[data-theme] .log time,
+:root[data-theme] .gate-table,
+:root[data-theme] .gate-run,
+:root[data-theme] .receipt,
+:root[data-theme] .drawer-hint {
+  font-size: var(--kv-font-label);
+  line-height: 1.4;
+}
+:root[data-theme] .rail-title { font-size: 14px; }
+:root[data-theme] .rail-local strong { font-size: 13px; }
+:root[data-theme] .rail-local p,
+:root[data-theme] .workspace-control p,
+:root[data-theme] .manual-backup-options p,
+:root[data-theme] .provenance-strip,
+:root[data-theme] .inline-note,
+:root[data-theme] .muted-copy,
+:root[data-theme] .status,
+:root[data-theme] .empty,
+:root[data-theme] .conversation-copy span,
+:root[data-theme] .pipeline-step small,
+:root[data-theme] .task-metrics span,
+:root[data-theme] .task-summary,
+:root[data-theme] .evidence-note,
+:root[data-theme] .record p,
+:root[data-theme] .list-item p,
+:root[data-theme] .recovery-card p {
+  font-size: 13px;
+  line-height: 1.55;
+}
+:root[data-theme] .page-head p,
+:root[data-theme] .topbar p,
+:root[data-theme] .hero p,
+:root[data-theme] .intro-copy p,
+:root[data-theme] .results-head p,
+:root[data-theme] .toolbar-copy p {
+  font-size: 15px;
+  line-height: 1.62;
+}
+
+/* Status colors remain readable on their surrounding surfaces. */
+:root[data-theme] .status[data-tone="success"],
+:root[data-theme] .success { color: var(--kv-good-readable) !important; }
+:root[data-theme] .status[data-tone="warning"],
+:root[data-theme] .warning { color: var(--kv-warn-readable) !important; }
+:root[data-theme] .status[data-tone="error"],
+:root[data-theme] .error { color: var(--kv-danger-readable) !important; }
+:root[data-theme] #status[data-tone="success"],
+:root[data-theme] #status[data-tone="warning"],
+:root[data-theme] #status[data-tone="error"] {
+  background: var(--kv-panel-raised);
+  border-width: 1px;
+}
+
+/* Data-dense surfaces */
+:root[data-theme] table { color: var(--kv-text); }
+:root[data-theme] th { color: var(--kv-muted); font-size: 12px; }
+:root[data-theme] td { color: var(--kv-text); font-size: 13px; }
+:root[data-theme] code,
+:root[data-theme] pre { color: #f1f6f2; }
+:root[data-theme] a:not(.rail-link):not(.brand-lockup) { color: var(--kv-accent-strong); text-underline-offset: 3px; }
+
+/* Theme picker is a functional control, not microcopy. */
+:root[data-theme] .theme-control__head span { font-size: 13px; }
+:root[data-theme] .theme-control__head small { font-size: 10px; color: var(--kv-muted); }
+:root[data-theme] .theme-control p { font-size: 11px; color: var(--kv-muted); }
+:root[data-theme] .theme-option {
+  min-height: 36px !important;
+  font-size: 12px !important;
+  color: var(--kv-ghost-text) !important;
+}
+:root[data-theme] .theme-option.is-active,
+:root[data-theme] .theme-option[aria-pressed="true"] {
+  color: var(--kv-text) !important;
+  border-color: var(--kv-secondary-border) !important;
+}
+
+/* Popup: increase type size and remove low-contrast ellipsis-only descriptions. */
+:root[data-theme] body:has(.popup-shell) {
+  width: 430px;
+  min-height: 0;
+  max-height: 600px;
+  overflow-y: auto;
+  font-size: 14px;
+}
+:root[data-theme] .popup-shell { padding: 16px; }
+:root[data-theme] .brand-lockup strong { font-size: 18px; }
+:root[data-theme] .brand-lockup span { font-size: 10px; color: var(--muted); }
+:root[data-theme] .local-badge { font-size: 11px; color: var(--kv-muted); }
+:root[data-theme] .hero-copy .eyebrow { font-size: 11px; }
+:root[data-theme] .hero-copy h1 { font-size: 31px; }
+:root[data-theme] .hero-copy p { font-size: 13px; line-height: 1.55; }
+:root[data-theme] .field-head label { font-size: 13px; }
+:root[data-theme] .field-head span { font-size: 11px; color: var(--muted); }
+:root[data-theme] .format-help { font-size: 12px; color: var(--muted); }
+:root[data-theme] .primary-action { min-height: 48px; font-size: 14px; }
+:root[data-theme] .section-label { font-size: 11px; color: var(--muted); }
+:root[data-theme] .quick-code { font-size: 11px; }
+:root[data-theme] .quick-action { min-height: 72px; }
+:root[data-theme] .quick-action strong { font-size: 13px; line-height: 1.25; }
+:root[data-theme] .quick-action small {
+  margin-top: 5px;
+  color: var(--kv-muted);
+  font-size: 11px;
+  line-height: 1.4;
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+:root[data-theme] body:has(.popup-shell) #status { font-size: 12px; color: var(--kv-muted); }
+:root[data-theme] body:has(.popup-shell) summary { font-size: 12px; color: var(--kv-ghost-text); }
+:root[data-theme] .details-body p { font-size: 12px; color: var(--kv-muted); }
+:root[data-theme] .next-step span { font-size: 10px; color: var(--kv-muted); }
+:root[data-theme] .next-step strong { font-size: 13px; }
+:root[data-theme] .next-step p { font-size: 11px; color: var(--kv-muted); }
+:root[data-theme] .text-action,
+:root[data-theme] .secondary-action { min-height: 38px; font-size: 12px; }
+:root[data-theme] .destination strong { font-size: 13px; }
+:root[data-theme] .destination small { font-size: 11px; color: var(--kv-muted); }
+:root[data-theme] .theme-control--compact .theme-segmented { max-width: 270px; }
+
+/* Unified task feedback must be readable while the user waits. */
+:root[data-theme] .task-feedback__eyebrow,
+:root[data-theme] .task-feedback__meta,
+:root[data-theme] .task-feedback__steps li { font-size: 11px; }
+:root[data-theme] .task-feedback__title { font-size: 16px; }
+:root[data-theme] .task-feedback__detail { font-size: 13px; color: var(--kv-muted); }
+
+@media (max-width: 1080px) {
+  :root[data-theme] .theme-option { min-height: 34px !important; }
+  :root[data-theme] .rail-title { font-size: 12px; }
+}
+
+@media (max-width: 760px) {
+  :root[data-theme] body { font-size: 15px; }
+  :root[data-theme] .rail-index { font-size: 11px; }
+  :root[data-theme] .rail-title { font-size: 13px; }
+}
+
+/* v0.16.7 page-by-page visibility corrections from Chromium computed-style audit. */
+
+/* Full workspace brand lockup: keep product name readable and only shrink the descriptor. */
+:root[data-theme] .side-rail .brand-lockup > span {
+  display: block;
+  margin-top: 0;
+  color: var(--kv-text);
+  font-size: 18px;
+  line-height: 1.1;
+  letter-spacing: 0;
+}
+:root[data-theme] .side-rail .brand-lockup .brand-name {
+  display: block;
+  color: var(--kv-text);
+  font: 750 18px/1.1 var(--kv-display);
+  letter-spacing: -.02em;
+}
+:root[data-theme] .side-rail .brand-lockup .brand-note {
+  display: block;
+  margin-top: 5px;
+  color: var(--kv-muted);
+  font: 11px/1.25 var(--kv-mono);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+/* Popup brand and guidance are functional labels, not decorative microcopy. */
+:root[data-theme] body:has(.popup-shell) .brand-lockup > div > span {
+  display: block;
+  margin-top: 5px;
+  color: var(--kv-muted);
+  font: 11px/1.2 var(--kv-mono);
+  letter-spacing: .1em;
+}
+:root[data-theme] body:has(.popup-shell) .next-step span,
+:root[data-theme] body:has(.popup-shell) .theme-control__head small {
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+/* Provenance copy is informative and must exceed normal-text contrast in both themes. */
+:root[data-theme] .provenance-strip,
+:root[data-theme] .provenance-strip span {
+  color: var(--kv-muted);
+}
+
+/* Backup page: health, scheduler and section codes remain legible at dashboard distance. */
+:root[data-theme] .health-grid span,
+:root[data-theme] .schedule-summary span,
+:root[data-theme] .overview .metric > span,
+:root[data-theme] .overview .metric small,
+:root[data-theme] .section-index > span {
+  color: var(--kv-muted);
+  font-size: 11px;
+  line-height: 1.3;
+}
+:root[data-theme] .section-index > span {
+  color: var(--kv-accent-strong);
+  font-family: var(--kv-mono);
+  font-weight: 750;
+}
+
+/* Project Context / Memory Gate: every label and state chip is actionable information. */
+:root[data-theme] .process-rail,
+:root[data-theme] .controls label,
+:root[data-theme] .controls label small,
+:root[data-theme] .gate-controls label,
+:root[data-theme] .gate-summary span,
+:root[data-theme] .gate-run span,
+:root[data-theme] .version span,
+:root[data-theme] .reason-list code,
+:root[data-theme] .explainer-actions a {
+  color: var(--kv-muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+:root[data-theme] .process-rail {
+  line-height: 1.2;
+}
+:root[data-theme] .gate-summary span {
+  min-height: 34px;
+  align-items: center;
+}
+:root[data-theme] .editor-gutter {
+  color: #dfe8e1;
+  font-size: 11px;
+  line-height: 1.15;
+  font-weight: 750;
+}
+:root[data-theme="light"] .editor-gutter {
+  color: #edf4ef;
+}
+:root[data-theme] .diff-row,
+:root[data-theme] .gate-table,
+:root[data-theme] .gate-table th,
+:root[data-theme] .gate-table td {
+  font-size: 12px;
+}
+
+/* Obsidian page: project label, quality badge and output tree use code-surface colors. */
+:root[data-theme] .primary-project,
+:root[data-theme] .gate-badge,
+:root[data-theme] .progress-text,
+:root[data-theme] .technical-quality > summary {
+  font-size: 11px;
+  line-height: 1.35;
+}
+:root[data-theme] .output-tree .phase {
+  color: #dce8e1;
+  font-size: 11px;
+}
+:root[data-theme] .output-tree pre {
+  color: #f1f6f2;
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+/* Capture Center uses a top header instead of the shared side rail. */
+:root[data-theme] .app-header .brand-lockup > span {
+  display: block;
+  margin-top: 0;
+  color: var(--kv-text);
+  font-size: 18px;
+  line-height: 1.1;
+  letter-spacing: 0;
+}
+:root[data-theme] .app-header .brand-lockup .brand-name {
+  display: block;
+  color: var(--kv-text);
+  font: 750 18px/1.1 var(--kv-display);
+  letter-spacing: -.02em;
+}
+:root[data-theme] .app-header .brand-lockup .brand-note {
+  display: block;
+  margin-top: 5px;
+  color: var(--kv-muted);
+  font: 11px/1.25 var(--kv-mono);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+/* Native hidden state must win over layout classes such as .recovery-actions. */
+:root[data-theme] [hidden] {
+  display: none !important;
+}
+
+/* Interactive microcopy uses a 12px floor; users should not need browser zoom to read controls. */
+:root[data-theme] .side-rail .brand-lockup .brand-note,
+:root[data-theme] .app-header .brand-lockup .brand-note,
+:root[data-theme] body:has(.popup-shell) .brand-lockup > div > span,
+:root[data-theme] body:has(.popup-shell) .next-step span,
+:root[data-theme] body:has(.popup-shell) .theme-control__head small,
+:root[data-theme] .quick-code,
+:root[data-theme] .quick-action small,
+:root[data-theme] summary span,
+:root[data-theme] summary small,
+:root[data-theme] .health-grid span,
+:root[data-theme] .schedule-summary span,
+:root[data-theme] .overview .metric > span,
+:root[data-theme] .overview .metric small,
+:root[data-theme] .section-index > span,
+:root[data-theme] .process-rail,
+:root[data-theme] .controls label,
+:root[data-theme] .controls label small,
+:root[data-theme] .gate-controls label,
+:root[data-theme] .gate-summary span,
+:root[data-theme] .gate-run span,
+:root[data-theme] .version span,
+:root[data-theme] .reason-list code,
+:root[data-theme] .explainer-actions a,
+:root[data-theme] .primary-project,
+:root[data-theme] .gate-badge,
+:root[data-theme] .progress-text,
+:root[data-theme] .technical-quality > summary {
+  font-size: 12px;
+}

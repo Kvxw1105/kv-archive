@@ -1,0 +1,123 @@
+{
+  "project": {
+    "id": "project-atlasdemo",
+    "title": "AtlasDemo",
+    "summary": "A local-first video production intelligence project.",
+    "createdAt": "2026-07-20T00:00:00.000Z",
+    "updatedAt": "2026-07-26T08:00:00.000Z",
+    "sourceProvider": "chatgpt"
+  },
+  "state": {
+    "projectId": "project-atlasdemo",
+    "projectTitle": "AtlasDemo",
+    "stateVersion": 4,
+    "stateHash": "sha256:state-fixture-v4",
+    "updatedAt": "2026-07-26T08:00:00.000Z",
+    "status": {
+      "summary": "The Lab Runner is ready for verified recipe execution.",
+      "phase": "Phase 0B",
+      "health": "healthy",
+      "progressPercent": 72,
+      "blockers": ["Real host acceptance is pending"],
+      "nextActions": ["Run the first real recipe", "Review waiting and resume behavior"]
+    },
+    "decisions": [
+      {
+        "id": "voice-first",
+        "title": "Voice timing is authoritative",
+        "summary": "Voice and subtitle timing drive scene boundaries.",
+        "status": "active",
+        "consequences": ["Visual scenes must adapt to audio timing"],
+        "evidenceUris": [
+          "contextvault://conversation/conv-atlasdemo-001/node/assistant-1?evidence=evidence-conv-001"
+        ],
+        "createdAt": "2026-07-22T10:00:00.000Z",
+        "updatedAt": "2026-07-25T10:00:00.000Z"
+      },
+      {
+        "id": "legacy-scene-policy",
+        "title": "Legacy fixed scene policy",
+        "summary": "The original fixed policy has been superseded.",
+        "status": "superseded",
+        "evidenceUris": [
+          "contextvault://conversation/conv-atlasdemo-001/node/user-1?evidence=evidence-conv-001"
+        ]
+      },
+      {
+        "id": "semantic-scene-policy",
+        "title": "Use semantic scene policies",
+        "summary": "Scene selection is driven by semantic intent.",
+        "status": "active",
+        "evidenceUris": [
+          "contextvault://conversation/conv-atlasdemo-002/node/assistant-2?evidence=evidence-conv-002"
+        ]
+      }
+    ],
+    "tasks": [
+      {
+        "id": "run-real-recipe",
+        "title": "Run a real recipe through the Lab Runner",
+        "status": "in_progress",
+        "priority": "high",
+        "owner": "KV",
+        "notes": "Verify policy hits, waiting, resume, and run log evidence.",
+        "dependsOnDecisionIds": ["voice-first", "semantic-scene-policy"],
+        "evidenceUris": [
+          "contextvault://conversation/conv-atlasdemo-002/node/user-2?evidence=evidence-conv-002"
+        ]
+      }
+    ],
+    "supersessions": [
+      {
+        "recordType": "decision",
+        "targetId": "legacy-scene-policy",
+        "replacementId": "semantic-scene-policy",
+        "reason": "Semantic policies preserve intent across templates.",
+        "createdAt": "2026-07-25T10:00:00.000Z"
+      }
+    ]
+  },
+  "memories": [
+    {
+      "id": "approved-core-v2",
+      "mode": "core",
+      "title": "AtlasDemo Core Memory",
+      "markdown": "# AtlasDemo Core Memory\n\nVoice timing is authoritative. The current phase is Phase 0B.",
+      "hash": "sha256:memory-core-v2",
+      "version": 2,
+      "approvedAt": "2026-07-26T08:10:00.000Z",
+      "sourceStateVersion": 4,
+      "sources": [
+        "contextvault://conversation/conv-atlasdemo-001/node/assistant-1?evidence=evidence-conv-001"
+      ]
+    },
+    {
+      "id": "approved-project-v2",
+      "mode": "project",
+      "title": "AtlasDemo Project Memory",
+      "markdown": "# AtlasDemo Project Memory\n\nThe Lab Runner must produce evidence-backed execution logs.",
+      "hash": "sha256:memory-project-v2",
+      "version": 2,
+      "approvedAt": "2026-07-26T08:10:00.000Z",
+      "sourceStateVersion": 4,
+      "sources": [
+        "contextvault://conversation/conv-atlasdemo-002/node/assistant-2?evidence=evidence-conv-002"
+      ]
+    }
+  ],
+  "assets": [
+    {
+      "id": "asset-lab-runner-diagram",
+      "title": "Lab Runner Diagram.png",
+      "mediaType": "image/png",
+      "byteLength": 12000,
+      "contentHash": "sha256:asset-diagram",
+      "localPath": "assets/lab-runner-diagram.png",
+      "conversationIds": ["conv-atlasdemo-002"],
+      "evidenceUris": [
+        "contextvault://conversation/conv-atlasdemo-002/node/assistant-2?evidence=evidence-conv-002"
+      ]
+    }
+  ],
+  "generatedAt": "2026-07-26T09:00:00.000Z"
+}

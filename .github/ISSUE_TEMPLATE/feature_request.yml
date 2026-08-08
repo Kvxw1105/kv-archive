@@ -1,0 +1,22 @@
+name: Feature request
+description: Propose an observable user outcome
+title: "[Feature] "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: User problem / job
+      description: Describe the user outcome before proposing implementation.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+    validations:
+      required: true
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Data / compatibility / privacy constraints

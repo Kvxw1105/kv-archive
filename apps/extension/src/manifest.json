@@ -1,0 +1,58 @@
+{
+  "manifest_version": 3,
+  "name": "KV Archive",
+  "version": "0.16.11",
+  "description": "Local-first multi-provider AI conversation archive with readable exports, evidence-preserving backups, batch conversation selection, and Agent-ready continuity.",
+  "permissions": [
+    "debugger",
+    "downloads",
+    "tabs",
+    "activeTab",
+    "scripting",
+    "alarms",
+    "idle",
+    "notifications"
+  ],
+  "host_permissions": [
+    "https://chatgpt.com/*",
+    "https://chat.openai.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "KV Archive",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "19": "icons/icon19.png",
+      "24": "icons/icon24.png",
+      "32": "icons/icon32.png",
+      "38": "icons/icon38.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "minimum_chrome_version": "116",
+  "optional_host_permissions": [
+    "https://gemini.google.com/*",
+    "https://grok.com/*",
+    "https://x.com/*",
+    "https://chat.deepseek.com/*",
+    "https://deepseek.com/*",
+    "https://www.doubao.com/*",
+    "https://doubao.com/*",
+    "https://chat.qwen.ai/*",
+    "https://chatglm.cn/*",
+    "https://chat.z.ai/*",
+    "https://z.ai/*",
+    "https://claude.ai/*",
+    "https://www.perplexity.ai/*",
+    "https://perplexity.ai/*"
+  ]
+}

@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>KV Archive · Obsidian 知识图谱</title>
+    <script src="theme-bootstrap.js"></script>
+<link rel="stylesheet" href="ui.css">
+  <link rel="stylesheet" href="task-feedback.css">
+  <link rel="stylesheet" href="knowledge.css">
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="visibility.css">
+</head>
+<body>
+  <div class="app-frame">
+    <aside class="side-rail" aria-label="KV Archive 主导航">
+      <a class="brand-lockup" href="backup.html"><img src="icons/icon48.png" alt=""><span><span class="brand-name">KV Archive</span><span class="brand-note">Local continuity system</span></span></a>
+      <div class="rail-label">Workspace</div>
+      <nav class="rail-nav">
+        <a class="rail-link" href="backup.html"><span class="rail-index">01</span><span><span class="rail-title">备份中心</span><span class="rail-subtitle">Capture</span></span></a>
+        <a class="rail-link" href="basket.html"><span class="rail-index">02</span><span><span class="rail-title">会话篮子</span><span class="rail-subtitle">Select</span></span></a>
+        <a class="rail-link" href="library.html"><span class="rail-index">02</span><span><span class="rail-title">本地资料库</span><span class="rail-subtitle">Library</span></span></a>
+        <a class="rail-link" href="state.html"><span class="rail-index">03</span><span><span class="rail-title">项目状态</span><span class="rail-subtitle">State</span></span></a>
+        <a class="rail-link" href="memory.html"><span class="rail-index">04</span><span><span class="rail-title">项目上下文</span><span class="rail-subtitle">Memory</span></span></a>
+        <a class="rail-link" aria-current="page" href="knowledge.html"><span class="rail-index">05</span><span><span class="rail-title">Obsidian 图谱</span><span class="rail-subtitle">Connect</span></span></a>
+      </nav>
+      <div class="rail-spacer"></div>
+      <div class="rail-local"><strong>插件零依赖</strong><p>导出的 Vault 使用 Markdown、Wiki Links 与 JSON Canvas，不要求安装社区插件。</p></div>
+    </aside>
+
+    <div class="app-stage">
+      <header class="page-head">
+        <div class="page-heading"><div class="eyebrow">KV ARCHIVE · CONNECT / 05</div><h1>Obsidian 知识图谱</h1><p>把一个 Project 转成可直接打开的 Obsidian Vault：Markdown、双向链接、MOC、证据索引、附件与 Project Canvas。</p></div>
+        <div class="head-status">全程本地处理 · 不消耗模型额度</div>
+      </header>
+
+      <main class="shell">
+        <div class="graph-motif" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><i></i><i></i><i></i></div>
+
+        <section class="controls card">
+          <div class="control-title"><span class="phase">VAULT COMPILER</span><h2>选择项目，先看结果</h2><p>第一次使用保持推荐设置即可。高级结构、附件与分卷选项已收起。</p></div>
+          <label class="primary-project">Project<select id="project"><option value="">请选择 Project</option></select></label>
+          <button id="preview">分析并预览</button>
+          <details class="advanced-options">
+            <summary><span>高级导出设置</span><small>结构、正文、附件、分卷</small></summary>
+            <div class="advanced-grid">
+              <label>知识结构<select id="structure"><option value="standard">Standard：对话 + 决策 + 任务 + 记忆</option><option value="compact">Compact：Project + 对话 + 当前状态</option></select></label>
+              <label>对话正文<select id="content"><option value="full">完整正文</option><option value="compact">轻量索引</option></select></label>
+              <label>附件<select id="asset-mode"><option value="include" selected>包含本地已下载附件</option><option value="skip">不导出附件二进制</option></select></label>
+              <label>分卷目标<select id="volume-size"><option value="12582912">低内存 · 12 MB</option><option value="25165824" selected>标准 · 24 MB</option><option value="50331648">大内存 · 48 MB</option></select></label>
+            </div>
+          </details>
+        </section>
+
+        <section class="metrics">
+          <div><span>节点</span><strong id="nodes">0</strong></div>
+          <div><span>关系</span><strong id="edges">0</strong></div>
+          <div><span>会话</span><strong id="conversations">0</strong></div>
+          <div><span>附件</span><strong id="assets">0</strong></div>
+          <div><span>预计分卷</span><strong id="volumes">0</strong></div>
+          <div><span>坏链接</span><strong id="broken">0</strong></div>
+          <div><span>路径复用</span><strong id="reused">0</strong></div>
+        </section>
+
+        <section class="workspace">
+          <article class="card overview-panel">
+            <div class="panel-head">
+              <div><span class="phase">EXPORT PREVIEW</span><h2>导出预览</h2><p id="status">选择 Project 后先分析。分析过程只在本地读取，不调用 AI 模型。</p></div>
+              <div class="actions"><button id="export" disabled>导出 Obsidian Vault</button><button id="copy-agent" class="secondary" disabled>复制 Agent 交接指令</button><button id="pause" class="ghost" disabled>当前卷后暂停</button></div>
+            </div>
+            <div class="progress"><div id="progress-bar"></div></div>
+            <div id="progress-text" class="progress-text">尚未开始</div>
+            <div id="summary" class="summary-box empty"><strong>尚未生成预览</strong><span>选择 Project 并点击“分析并预览”，这里会显示节点、关系、路径复用、附件与分卷计划。</span></div>
+          </article>
+
+          <aside class="card validation">
+            <div class="validation-head"><div><span class="phase">QUALITY GATE</span><h2>导出质量门</h2></div><span class="gate-badge">本地检查</span></div>
+            <div id="quality-verdict" class="quality-verdict" data-tone="idle">
+              <strong id="quality-title">尚未分析</strong>
+              <p id="quality-detail">选择 Project 后先分析，系统会告诉你是否可以安全导出。</p>
+            </div>
+            <details class="technical-quality">
+              <summary><span>查看技术质量报告</span><span>展开 ＋</span></summary>
+              <dl>
+                <div><dt>重复节点</dt><dd id="duplicate-nodes">0</dd></div>
+                <div><dt>悬空关系</dt><dd id="dangling">0</dd></div>
+                <div><dt>证据缺失</dt><dd id="missing-evidence">0</dd></div>
+                <div><dt>未下载附件</dt><dd id="asset-missing">0</dd></div>
+                <div><dt>Canvas 引用错误</dt><dd id="canvas-errors">0</dd></div>
+              </dl>
+            </details>
+            <div class="output-tree"><span class="phase">OUTPUT TREE</span><pre>00 Home/
+  START_HERE.md
+  AGENT_PROMPT.md
+10 Projects/
+20 Conversations/
+30 Decisions/
+40 Tasks/
+50 Memories/
+60 Evidence/
+80 Canvas/
+90 Attachments/
+99 System/</pre></div>
+            <p class="note">多个 ZIP 分卷需要全部解压到同一目录。附件只复制本地备份中已成功下载的二进制，不会在导出时联网重试。KV Archive 不会直接写入或删除你已有的 Obsidian 文件。</p>
+          </aside>
+        </section>
+      </main>
+    </div>
+  </div>
+  <script type="module" src="theme-manager.js"></script>
+  <script type="module" src="knowledge.js"></script>
+</body>
+</html>

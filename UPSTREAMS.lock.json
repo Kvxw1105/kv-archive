@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "generatedFor": "ContextVault planning package",
+  "upstreams": [
+    {
+      "repository": "yesooner/chatgpt-conversation-export-extension",
+      "url": "https://github.com/yesooner/chatgpt-conversation-export-extension",
+      "commit": "9eb0dfe9a6bd9173a53db5ac1cac7caefa8744e2",
+      "license": "MIT",
+      "role": "debugger-network-adapter reference",
+      "status": "ADAPTED_IN_MVP",
+      "localFiles": [
+        "apps/extension/src/background.js"
+      ],
+      "modifications": "Capture lifecycle adapted; normalization, integrity and multi-file evidence export added."
+    },
+    {
+      "repository": "brianjlacy/export-chatgpt",
+      "url": "https://github.com/brianjlacy/export-chatgpt",
+      "commit": "4cfc3f235ad41c864e7fe2369fb0037875537dbd",
+      "license": "MIT",
+      "role": "bulk-api-adapter reference",
+      "status": "DESIGN_REFERENCE_BATCH_1_2_NO_CODE_COPIED",
+      "localFiles": [
+        "apps/extension/src/history-api.js",
+        "apps/extension/src/history-engine.js",
+        "apps/extension/src/history-archive.js"
+      ],
+      "modifications": "Independent implementation informed by documented regular, archived, Project, pagination and progress concepts; added workspace-safe transient auth, v1-to-v2 migration and source-aware archive; no upstream source file copied."
+    },
+    {
+      "repository": "pionxzh/chatgpt-exporter",
+      "url": "https://github.com/pionxzh/chatgpt-exporter",
+      "commit": "TO_PIN_BEFORE_IMPORT",
+      "license": "MIT",
+      "role": "renderer and export UX reference",
+      "status": "REQUIRES_GATE_0_PIN"
+    },
+    {
+      "repository": "FredySandoval/ChatGPT-CHROME_EXTENSION",
+      "url": "https://github.com/FredySandoval/ChatGPT-CHROME_EXTENSION",
+      "commit": "TO_PIN_BEFORE_IMPORT",
+      "license": "MIT",
+      "role": "WXT extension shell reference",
+      "status": "REQUIRES_GATE_0_PIN"
+    },
+    {
+      "repository": "slyubarskiy/chatgpt-conversation-extractor",
+      "url": "https://github.com/slyubarskiy/chatgpt-conversation-extractor",
+      "commit": "TO_PIN_BEFORE_IMPORT",
+      "license": "MIT",
+      "role": "official-export-adapter reference",
+      "status": "REQUIRES_GATE_0_PIN"
+    },
+    {
+      "repository": "modelcontextprotocol/specification",
+      "url": "https://modelcontextprotocol.io/specification/2025-06-18/",
+      "commit": "PROTOCOL_REVISION_2025-06-18",
+      "license": "Specification reference; no source copied",
+      "role": "MCP JSON-RPC and stdio standards reference",
+      "status": "DESIGN_REFERENCE_BATCH_5_NO_CODE_COPIED",
+      "localFiles": [
+        "apps/agent/src/mcp-server.js"
+      ],
+      "modifications": "Independent dependency-free implementation of required read-only lifecycle, tools and resources."
+    }
+  ]
+}

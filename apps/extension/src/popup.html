@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KV Archive</title>
+    <script src="theme-bootstrap.js"></script>
+<link rel="stylesheet" href="popup.css">
+  <link rel="stylesheet" href="task-feedback.css">
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="visibility.css">
+</head>
+<body>
+  <main class="popup-shell">
+    <header class="brand-row">
+      <div class="brand-lockup">
+        <img src="icons/icon48.png" alt="">
+        <div><strong>KV Archive</strong><span>LOCAL AI ARCHIVE</span></div>
+      </div>
+      <div class="local-badge"><i></i>本地运行</div>
+    </header>
+
+    <section class="hero-copy">
+      <div class="eyebrow">当前任务</div>
+      <h1 id="hero-title">保存这段对话</h1>
+      <p id="hero-description">默认收进本地资料库，需要时再下载一个可独立保存的文件。</p>
+    </section>
+
+    <section id="next-step" class="next-step" data-state="loading">
+      <div><span>推荐下一步</span><strong id="next-step-title">正在检查本地状态…</strong><p id="next-step-body">不会上传你的聊天内容。</p></div>
+      <button id="next-step-action" class="text-action" disabled>请稍候</button>
+    </section>
+
+    <section class="export-card">
+      <div class="save-destinations" aria-label="保存位置">
+        <label class="destination primary-destination"><input id="save-library" type="checkbox" checked><span><strong>收进本地资料库</strong><small>默认推荐，保存后可搜索和继续使用</small></span></label>
+        <label class="destination"><input id="download-file" type="checkbox"><span><strong>同时下载文件</strong><small>生成 HTML、Markdown 或 ZIP 到电脑</small></span></label>
+      </div>
+
+      <details id="download-options" class="download-options">
+        <summary><span>下载格式与内容</span><span aria-hidden="true">＋</span></summary>
+        <div class="download-options-body">
+          <div class="field-group">
+            <div class="field-head"><label for="format">文件格式</label><span>01</span></div>
+            <select id="format">
+              <option value="readable-html">可读网页 HTML（推荐）</option>
+              <option value="markdown">Markdown 文档</option>
+              <option value="backup-zip">当前对话备份包 ZIP（高级）</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <div class="field-head"><label for="content-mode">文件内容</label><span>02</span></div>
+            <select id="content-mode">
+              <option value="conversation">精简对话：问题＋AI 正式回答（推荐）</option>
+              <option value="assistant-only">仅 AI 正式回答</option>
+              <option value="technical">完整技术记录：工具与推理摘要</option>
+            </select>
+          </div>
+          <div id="format-help" class="format-help">默认不导出工具调用、工具结果和推理摘要。</div>
+        </div>
+      </details>
+
+      <button id="export" class="primary-action">保存当前对话</button>
+      <button id="generic-capture" class="secondary-action" hidden>尝试通用网页对话模式</button>
+      <div id="result-actions" class="result-actions" hidden>
+        <button id="open-library" class="secondary-action">立即查看</button>
+        <button id="show-download" class="secondary-action" hidden>显示下载文件</button>
+      </div>
+    </section>
+
+    <div class="section-label"><span>常用入口</span><span>不必一次学会全部</span></div>
+    <nav class="quick-grid" aria-label="KV Archive 功能入口">
+      <button id="history" class="quick-action"><span class="quick-code">01</span><span><strong>备份中心</strong><small>全部历史、项目与空间、电脑备份</small></span></button>
+      <button id="basket" class="quick-action"><span class="quick-code">02</span><span><strong>会话篮子</strong><small>多选完整会话并批量导出</small></span></button>
+      <button id="library" class="quick-action"><span class="quick-code">03</span><span><strong>本地资料库</strong><small>搜索与重新利用</small></span></button>
+      <button id="capture" class="quick-action"><span class="quick-code">04</span><span><strong>记录中心</strong><small>闪念、笔记、摘录与关系</small></span></button>
+    </nav>
+    <details class="workspace-drawer">
+      <summary><span>长期项目与高级工具</span><span aria-hidden="true">＋</span></summary>
+      <nav class="advanced-grid" aria-label="高级功能入口">
+        <button id="state" class="quick-action"><span class="quick-code">03</span><span><strong>项目状态</strong><small>审核、版本与回滚</small></span></button>
+        <button id="memory" class="quick-action"><span class="quick-code">04</span><span><strong>项目上下文</strong><small>把已确认信息整理给新 AI</small></span></button>
+        <button id="knowledge" class="quick-action wide"><span class="quick-code">05</span><span><strong>Obsidian 图谱</strong><small>导出双链、Canvas 与 Agent 交接包</small></span></button>
+      </nav>
+    </details>
+
+    <div id="status" role="status">请打开一个已识别 AI 平台的对话页面。</div>
+    <div id="recovery-actions" class="recovery-actions" hidden>
+      <button id="recovery-primary" class="secondary-action"></button>
+      <button id="recovery-secondary" class="secondary-action"></button>
+    </div>
+
+    <details class="what-happens">
+      <summary><span>保存时会发生什么？</span><span aria-hidden="true">＋</span></summary>
+      <div class="details-body">
+        <p>ChatGPT 优先读取结构化完整会话；接口或网络结果无法证明完整时，会自动持续向上加载历史并逐段累积。浏览器可能短暂显示“调试器已附加”。</p>
+        <p>本地资料库保存原始证据和可搜索索引；下载文件默认只保留问题与 AI 正式回答。</p>
+        <p>保存到资料库不等于已经生成电脑备份。全部历史和独立 ZIP 请前往备份中心。</p>
+      </div>
+    </details>
+  </main>
+  <script type="module" src="theme-manager.js"></script>
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+{
+  "graphHash": "sha256:cded97ae22bb0c4943436eb5cd104f8a0ce71ee7dfd8ec1b7cc1115d55d3fb04",
+  "nodeIds": [
+    "asset:project-atlasdemo:asset-lab-runner-diagram",
+    "conversation:conv-atlasdemo-001",
+    "conversation:conv-atlasdemo-002",
+    "decision:project-atlasdemo:legacy-scene-policy",
+    "decision:project-atlasdemo:semantic-scene-policy",
+    "decision:project-atlasdemo:voice-first",
+    "evidence:project-atlasdemo:index",
+    "memory:project-atlasdemo:approved-core-v2",
+    "memory:project-atlasdemo:approved-project-v2",
+    "project:project-atlasdemo",
+    "task:project-atlasdemo:run-real-recipe"
+  ],
+  "relations": [
+    "asset:project-atlasdemo:asset-lab-runner-diagram|belongs_to|project:project-atlasdemo",
+    "asset:project-atlasdemo:asset-lab-runner-diagram|references|conversation:conv-atlasdemo-002",
+    "conversation:conv-atlasdemo-001|belongs_to|project:project-atlasdemo",
+    "conversation:conv-atlasdemo-002|belongs_to|project:project-atlasdemo",
+    "decision:project-atlasdemo:legacy-scene-policy|belongs_to|project:project-atlasdemo",
+    "decision:project-atlasdemo:legacy-scene-policy|derived_from|conversation:conv-atlasdemo-001",
+    "decision:project-atlasdemo:semantic-scene-policy|belongs_to|project:project-atlasdemo",
+    "decision:project-atlasdemo:semantic-scene-policy|derived_from|conversation:conv-atlasdemo-002",
+    "decision:project-atlasdemo:semantic-scene-policy|supersedes|decision:project-atlasdemo:legacy-scene-policy",
+    "decision:project-atlasdemo:voice-first|belongs_to|project:project-atlasdemo",
+    "decision:project-atlasdemo:voice-first|derived_from|conversation:conv-atlasdemo-001",
+    "evidence:project-atlasdemo:index|belongs_to|project:project-atlasdemo",
+    "evidence:project-atlasdemo:index|references|conversation:conv-atlasdemo-001",
+    "evidence:project-atlasdemo:index|references|conversation:conv-atlasdemo-002",
+    "memory:project-atlasdemo:approved-core-v2|belongs_to|project:project-atlasdemo",
+    "memory:project-atlasdemo:approved-core-v2|summarizes|conversation:conv-atlasdemo-001",
+    "memory:project-atlasdemo:approved-project-v2|belongs_to|project:project-atlasdemo",
+    "memory:project-atlasdemo:approved-project-v2|summarizes|conversation:conv-atlasdemo-002",
+    "task:project-atlasdemo:run-real-recipe|belongs_to|project:project-atlasdemo",
+    "task:project-atlasdemo:run-real-recipe|depends_on|decision:project-atlasdemo:semantic-scene-policy",
+    "task:project-atlasdemo:run-real-recipe|depends_on|decision:project-atlasdemo:voice-first",
+    "task:project-atlasdemo:run-real-recipe|derived_from|conversation:conv-atlasdemo-002"
+  ]
+}

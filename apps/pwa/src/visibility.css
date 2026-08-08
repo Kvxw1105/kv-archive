@@ -1,0 +1,90 @@
+/* KV Archive Notes v0.16.9 visibility hardening. */
+:root[data-theme="light"] {
+  --ink: #171d19;
+  --muted: #4f554f;
+  --line: rgba(28, 26, 23, .24);
+  --wine: #7e1f2d;
+  --wine-dark: #59131b;
+  --body-copy: #383531;
+  --control: #fffdf8;
+  --chip: #f0ece5;
+  --disabled-bg: #e6e2dc;
+  --disabled-text: #68635d;
+  --disabled-border: #c5beb4;
+}
+:root[data-theme="dark"] {
+  --ink: #faf5ed;
+  --muted: #c6bdb2;
+  --line: rgba(255,255,255,.22);
+  --wine: #d55b6d;
+  --wine-dark: #ef8291;
+  --body-copy: #e7ded3;
+  --control: #322c26;
+  --chip: #2b2621;
+  --disabled-bg: #302b26;
+  --disabled-text: #aaa198;
+  --disabled-border: #514941;
+}
+:root[data-theme] body { font-size: 16px; line-height: 1.6; }
+:root[data-theme] button,
+:root[data-theme] input,
+:root[data-theme] select,
+:root[data-theme] textarea { font-size: 14px; line-height: 1.4; }
+:root[data-theme] button { min-height: 44px; }
+:root[data-theme] .primary { color: #fff; background: var(--wine); }
+:root[data-theme] .danger { color: #fff; background: #913b35; }
+:root[data-theme] .icon-button,
+:root[data-theme] .secondary,
+:root[data-theme] .card-actions button,
+:root[data-theme] .nav-item,
+:root[data-theme] .theme-cycle-button { color: var(--ink); background: var(--chip); border: 1px solid var(--line); }
+:root[data-theme] button:disabled {
+  opacity: 1;
+  color: var(--disabled-text) !important;
+  background: var(--disabled-bg) !important;
+  border-color: var(--disabled-border) !important;
+  cursor: not-allowed;
+}
+:root[data-theme] input,
+:root[data-theme] textarea,
+:root[data-theme] select { border-color: var(--line); }
+:root[data-theme] input::placeholder,
+:root[data-theme] textarea::placeholder { color: var(--muted); opacity: 1; }
+:root[data-theme] .eyebrow { font-size: 11px; }
+:root[data-theme] .status-dot,
+:root[data-theme] .pill,
+:root[data-theme] .filters label,
+:root[data-theme] .field-grid label,
+:root[data-theme] #edit-form label,
+:root[data-theme] .advanced-fields label,
+:root[data-theme] .timeline-summary,
+:root[data-theme] .day-label,
+:root[data-theme] .note-meta,
+:root[data-theme] .nav-item small,
+:root[data-theme] .receipt strong,
+:root[data-theme] .receipt small { font-size: 12px; line-height: 1.45; }
+:root[data-theme] .inline-status,
+:root[data-theme] .plan-box,
+:root[data-theme] .tool-card p { font-size: 14px; }
+:root[data-theme] .note-card p { color: var(--body-copy); font-size: 15px; }
+:root[data-theme] .theme-cycle-button [data-theme-cycle-label] { font-size: 12px; }
+:root[data-theme] .theme-option { font-size: 13px; color: var(--muted); }
+
+/* Accent text and white-on-color controls need different luminance in dark mode. */
+:root[data-theme="light"] {
+  --wine-control: #7e1f2d;
+  --wine-control-active: #59131b;
+}
+:root[data-theme="dark"] {
+  --wine-control: #b94257;
+  --wine-control-active: #9c3043;
+}
+:root[data-theme] .primary,
+:root[data-theme] .quick-add {
+  color: #fff;
+  background: var(--wine-control);
+}
+:root[data-theme] .primary:active,
+:root[data-theme] .quick-add:active {
+  background: var(--wine-control-active);
+}

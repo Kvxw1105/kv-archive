@@ -1,0 +1,53 @@
+{
+  "id": "conv-atlasdemo-002",
+  "title": "Semantic scene policy",
+  "create_time": 1785032200,
+  "update_time": 1785032800,
+  "current_node": "assistant-2",
+  "project_id": "project-atlasdemo",
+  "mapping": {
+    "root": { "id": "root", "parent": null, "children": ["user-2"], "message": null },
+    "user-2": {
+      "id": "user-2",
+      "parent": "root",
+      "children": ["assistant-2", "assistant-history"],
+      "message": {
+        "id": "msg-user-2",
+        "author": { "role": "user" },
+        "create_time": 1785032210,
+        "content": { "content_type": "text", "parts": ["How should scenes be selected across templates?"] },
+        "metadata": {}
+      }
+    },
+    "assistant-2": {
+      "id": "assistant-2",
+      "parent": "user-2",
+      "children": [],
+      "message": {
+        "id": "msg-assistant-2",
+        "author": { "role": "assistant" },
+        "create_time": 1785032220,
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "Use semantic scene policies and retain evidence-backed run logs.",
+            { "type": "future_widget", "text": "Unknown content remains represented.", "payload": { "fixture": true } }
+          ]
+        },
+        "metadata": { "model_slug": "synthetic-model" }
+      }
+    },
+    "assistant-history": {
+      "id": "assistant-history",
+      "parent": "user-2",
+      "children": [],
+      "message": {
+        "id": "msg-assistant-history",
+        "author": { "role": "assistant" },
+        "create_time": 1785032230,
+        "content": { "content_type": "text", "parts": ["Use a single fixed scene policy."] },
+        "metadata": { "model_slug": "synthetic-model" }
+      }
+    }
+  }
+}

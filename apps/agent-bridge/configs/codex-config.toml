@@ -1,0 +1,4 @@
+[mcp_servers.kv_archive]
+command = "node"
+args = ["/ABSOLUTE/PATH/kv-archive-agent-bridge/dist/agent/index.js", "serve", "--bundle", "/ABSOLUTE/PATH/KV-Archive-Agent-Bundle.zip", "--proposal-dir", "/ABSOLUTE/PATH/kv-archive-proposals"]
+startup_timeout_ms = 20000

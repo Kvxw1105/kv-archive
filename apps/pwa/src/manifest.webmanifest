@@ -1,0 +1,22 @@
+{
+  "name": "KV Archive Notes",
+  "short_name": "KV Notes",
+  "description": "本地优先的手机笔记、闪念与归档工具。",
+  "id": "./",
+  "start_url": "./#timeline",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "background_color": "#f4efe6",
+  "theme_color": "#8e2332",
+  "orientation": "portrait-primary",
+  "categories": ["productivity", "utilities"],
+  "icons": [
+    { "src": "./icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "./icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    { "name": "快速记录", "short_name": "记录", "url": "./#capture", "icons": [{ "src": "./icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "数据与恢复", "short_name": "恢复", "url": "./#tools", "icons": [{ "src": "./icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

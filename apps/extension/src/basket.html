@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>KV Archive · 会话篮子</title>
+    <script src="theme-bootstrap.js"></script>
+<link rel="stylesheet" href="ui.css">
+  <link rel="stylesheet" href="task-feedback.css">
+  <link rel="stylesheet" href="basket.css">
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="visibility.css">
+</head>
+<body>
+  <div class="app-frame">
+    <aside class="side-rail" aria-label="KV Archive 主导航">
+      <a class="brand-lockup" href="backup.html"><img src="icons/icon48.png" alt=""><span><span class="brand-name">KV Archive</span><span class="brand-note">Local continuity system</span></span></a>
+      <div class="rail-label">Workspace</div>
+      <nav class="rail-nav">
+        <a class="rail-link" href="backup.html"><span class="rail-index">01</span><span><span class="rail-title">备份中心</span><span class="rail-subtitle">Capture all</span></span></a>
+        <a class="rail-link" aria-current="page" href="basket.html"><span class="rail-index">02</span><span><span class="rail-title">会话篮子</span><span class="rail-subtitle">Select</span></span></a>
+        <a class="rail-link" href="library.html"><span class="rail-index">03</span><span><span class="rail-title">本地资料库</span><span class="rail-subtitle">Library</span></span></a>
+        <a class="rail-link" href="state.html"><span class="rail-index">04</span><span><span class="rail-title">项目状态</span><span class="rail-subtitle">State</span></span></a>
+        <a class="rail-link" href="memory.html"><span class="rail-index">05</span><span><span class="rail-title">项目上下文</span><span class="rail-subtitle">Memory</span></span></a>
+        <a class="rail-link" href="knowledge.html"><span class="rail-index">06</span><span><span class="rail-title">Obsidian 图谱</span><span class="rail-subtitle">Connect</span></span></a>
+      </nav>
+      <div class="rail-spacer"></div>
+      <div class="rail-local"><strong>以会话为单位</strong><p>会话目录与选择集自动保存在浏览器中；刷新或重新打开后可以继续，不修改原平台内容。</p></div>
+    </aside>
+    <div class="app-stage">
+      <header class="page-head">
+        <div class="page-heading"><div class="eyebrow">KV ARCHIVE · CONVERSATION BASKET / 02</div><h1>多选完整会话，再统一导出</h1><p>不是选择一条对话里的几段消息，而是直接勾选多条完整会话。当前首个高保真实现为 ChatGPT；其他平台会按能力等级逐步接入。</p></div>
+        <div id="connection" class="head-status">正在检查 ChatGPT…</div>
+      </header>
+      <main class="shell basket-shell">
+        <div class="provenance-strip"><span><strong>两步完成：</strong>先把会话采集并持续保存到浏览器，再把任意已保存成果导出为本地 ZIP。</span><span>暂停不会清空已保存内容</span></div>
+
+        <section class="card basket-toolbar">
+          <div class="toolbar-copy"><span class="phase">CONVERSATION CATALOG</span><h2>选择会话</h2><p id="catalog-summary">首次读取后会缓存在本地；以后打开页面会立即恢复，只有需要最新内容时才刷新。</p></div>
+          <div class="toolbar-actions"><button id="load" class="primary">读取会话目录</button><button id="select-visible" class="secondary" disabled>全选当前结果</button><button id="clear-selection" class="ghost" disabled>清空选择</button></div>
+          <div class="basket-filters">
+            <input id="query" type="search" placeholder="搜索会话标题…" autocomplete="off">
+            <select id="collection"><option value="">全部项目与空间</option></select>
+            <select id="scope"><option value="all">全部会话</option><option value="active">普通会话</option><option value="archived">归档会话</option></select>
+          </div>
+        </section>
+
+        <section class="basket-layout">
+          <div class="card conversation-panel">
+            <div class="panel-head"><div><span class="phase">AVAILABLE</span><h2>会话目录</h2></div><strong id="visible-count">0</strong></div>
+            <div id="conversation-list" class="conversation-list"><div class="empty">尚未读取会话目录。</div></div>
+            <div class="list-footer"><span id="catalog-render-meta">尚无目录</span><button id="load-more-conversations" class="ghost" type="button" hidden>继续显示</button></div>
+          </div>
+          <aside class="card selection-panel">
+            <div class="panel-head"><div><span class="phase">SELECTED</span><h2>当前选择集</h2></div><strong id="selected-count">0</strong></div>
+            <input id="selection-title" type="text" value="我的会话导出" aria-label="选择集名称">
+            <div id="selected-list" class="selected-list"><div class="empty">还没有选择会话。</div></div>
+            <label class="select-field"><span>附件策略</span><select id="asset-policy"><option value="references-only">仅保存附件引用（推荐）</option><option value="download">同时下载可访问附件</option></select></label>
+            <button id="export-selected" class="primary" disabled>开始采集到浏览器</button>
+            <button id="pause-capture" class="secondary" disabled>暂停采集</button>
+            <button id="export-saved" class="secondary" disabled>导出已保存到本地</button>
+            <button id="save-selection" class="secondary">立即保存</button>
+            <button id="new-batch" class="ghost" type="button" hidden>新建选择批次</button>
+          </aside>
+        </section>
+
+        <section class="card progress-card">
+          <div class="panel-head"><div><span id="phase" class="phase">IDLE</span><h2 id="progress-title">等待选择</h2></div><strong id="percent">0%</strong></div>
+          <div class="pipeline-steps" aria-label="处理阶段">
+            <div id="capture-step" class="pipeline-step" data-state="idle"><span>1</span><strong>采集到浏览器</strong><small>可暂停、可继续</small></div>
+            <div id="export-step" class="pipeline-step" data-state="idle"><span>2</span><strong>导出到本地</strong><small>随时导出已保存成果</small></div>
+          </div>
+          <div class="task-metrics">
+            <div><span>已选择</span><strong id="task-selected-count">0</strong></div>
+            <div><span>已保存</span><strong id="saved-count">0</strong></div>
+            <div><span>待处理</span><strong id="remaining-count">0</strong></div>
+            <div><span>失败待重试</span><strong id="failed-count">0</strong></div>
+          </div>
+          <div class="bar"><span id="bar"></span></div>
+          <p id="status" class="status">读取目录后，勾选需要导出的完整会话。</p>
+          <p id="task-summary" class="task-summary">没有进行中的采集批次。</p>
+          <ol id="log" class="log"></ol>
+        </section>
+      </main>
+    </div>
+  </div>
+  <script type="module" src="theme-manager.js"></script>
+  <script type="module" src="basket.js"></script>
+</body>
+</html>

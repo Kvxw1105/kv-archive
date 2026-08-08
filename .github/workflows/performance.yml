@@ -1,0 +1,28 @@
+name: performance-gates
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 3 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  performance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run test:performance
+      - run: npm run test:snapshot-performance
+      - run: npm run test:obsidian-performance
+      - run: npm run test:capture-recovery-performance
+      - run: npm run test:handoff-performance
+      - run: npm run test:pwa-performance
+      - run: npm run test:conversation-chunk-performance

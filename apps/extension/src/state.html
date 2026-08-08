@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>KV Archive · 项目状态</title>
+    <script src="theme-bootstrap.js"></script>
+<link rel="stylesheet" href="ui.css">
+  <link rel="stylesheet" href="task-feedback.css">
+  <link rel="stylesheet" href="state.css">
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="visibility.css">
+</head>
+<body>
+  <div class="app-frame">
+    <aside class="side-rail" aria-label="KV Archive 主导航">
+      <a class="brand-lockup" href="backup.html"><img src="icons/icon48.png" alt=""><span><span class="brand-name">KV Archive</span><span class="brand-note">Local continuity system</span></span></a>
+      <div class="rail-label">Workspace</div>
+      <nav class="rail-nav">
+        <a class="rail-link" href="backup.html"><span class="rail-index">01</span><span><span class="rail-title">备份中心</span><span class="rail-subtitle">Capture</span></span></a>
+        <a class="rail-link" href="basket.html"><span class="rail-index">02</span><span><span class="rail-title">会话篮子</span><span class="rail-subtitle">Select</span></span></a>
+        <a class="rail-link" href="library.html"><span class="rail-index">02</span><span><span class="rail-title">本地资料库</span><span class="rail-subtitle">Library</span></span></a>
+        <a class="rail-link" aria-current="page" href="state.html"><span class="rail-index">03</span><span><span class="rail-title">项目状态</span><span class="rail-subtitle">State</span></span></a>
+        <a class="rail-link" href="memory.html"><span class="rail-index">04</span><span><span class="rail-title">项目上下文</span><span class="rail-subtitle">Memory</span></span></a>
+        <a class="rail-link" href="knowledge.html"><span class="rail-index">05</span><span><span class="rail-title">Obsidian 图谱</span><span class="rail-subtitle">Connect</span></span></a>
+      </nav>
+      <div class="rail-spacer"></div>
+      <div class="rail-local"><strong>只接受提案</strong><p>Agent 无权直接覆盖项目状态。每一次批准、拒绝和回滚都会进入审计记录。</p></div>
+    </aside>
+
+    <div class="app-stage">
+      <header class="page-head">
+        <div class="page-heading"><div class="eyebrow">KV ARCHIVE · STATE / 03</div><h1>项目状态中心</h1><p>把项目目标、阶段、决策、任务和保护区变成可审核版本。Agent 可以提交提案，但不能直接覆盖真源。</p></div>
+        <div class="top-actions"><label class="button"><input id="proposal-files" type="file" accept="application/json,.json" multiple>导入 Agent 提案</label></div>
+      </header>
+
+      <main class="shell">
+        <section class="notice governance-notice">
+          <div class="notice-index">GATE<br>03</div>
+          <div><span class="phase">GOVERNED STATE</span><h2>Agent 只能提议，不能直接写入</h2><p>每个提案必须引用本地证据，并经过冲突检查、Diff 审阅和人工批准。批准与回滚都会生成不可覆盖的新版本。</p></div>
+          <div id="status" class="status status-capsule">尚未导入提案。</div>
+        </section>
+
+        <section class="metrics">
+          <div><span>已建立状态</span><strong id="metric-states">0</strong></div>
+          <div><span>待审核</span><strong id="metric-pending">0</strong></div>
+          <div><span>冲突提案</span><strong id="metric-conflicted">0</strong></div>
+          <div><span>审计事件</span><strong id="metric-events">0</strong></div>
+        </section>
+
+        <section class="controlbar card">
+          <div class="control-title"><span class="phase">PROJECT SCOPE</span><h2>选择状态范围</h2></div>
+          <label>Project<select id="project"><option value="">请选择 Project</option></select></label>
+          <label>提案状态<select id="proposal-status"><option value="all">全部</option><option value="pending">待审核</option><option value="conflicted">有冲突</option><option value="approved">已批准</option><option value="rejected">已拒绝</option></select></label>
+          <button id="refresh" class="ghost">刷新</button>
+        </section>
+
+        <section class="grid">
+          <article class="panel state-panel">
+            <div class="panel-head"><div><span class="kicker">APPROVED STATE</span><h2>当前已批准状态</h2></div><span id="state-version" class="version">v0</span></div>
+            <div id="current-state" class="panel-body empty">选择一个 Project。</div>
+          </article>
+          <article class="panel proposal-panel"><div class="panel-head"><div><span class="kicker">PROPOSAL INBOX</span><h2>Agent 提案</h2></div><span class="panel-mark">REVIEW</span></div><div id="proposals" class="panel-body list empty">暂无提案。</div></article>
+          <article class="panel"><div class="panel-head"><div><span class="kicker">VERSION HISTORY</span><h2>版本历史</h2></div><span class="panel-mark">IMMUTABLE</span></div><div id="versions" class="panel-body list empty">暂无已批准版本。</div></article>
+          <article class="panel"><div class="panel-head"><div><span class="kicker">AUDIT LOG</span><h2>审计记录</h2></div><span class="panel-mark">LEDGER</span></div><div id="events" class="panel-body list empty">暂无审计事件。</div></article>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <dialog id="review-dialog">
+    <form method="dialog" class="dialog-top"><button class="close" aria-label="关闭">×</button></form>
+    <article id="review-content"></article>
+  </dialog>
+  <script type="module" src="theme-manager.js"></script>
+  <script type="module" src="state.js"></script>
+</body>
+</html>

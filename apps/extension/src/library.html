@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>KV Archive · 本地资料库</title>
+    <script src="theme-bootstrap.js"></script>
+<link rel="stylesheet" href="ui.css">
+  <link rel="stylesheet" href="task-feedback.css">
+  <link rel="stylesheet" href="library.css">
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="visibility.css">
+</head>
+<body>
+  <div class="app-frame">
+    <aside class="side-rail" aria-label="KV Archive 主导航">
+      <a class="brand-lockup" href="backup.html"><img src="icons/icon48.png" alt=""><span><span class="brand-name">KV Archive</span><span class="brand-note">Local continuity system</span></span></a>
+      <div class="rail-label">Workspace</div>
+      <nav class="rail-nav">
+        <a class="rail-link" href="backup.html"><span class="rail-index">01</span><span><span class="rail-title">备份中心</span><span class="rail-subtitle">Capture</span></span></a>
+        <a class="rail-link" href="basket.html"><span class="rail-index">02</span><span><span class="rail-title">会话篮子</span><span class="rail-subtitle">Select</span></span></a>
+        <a class="rail-link" aria-current="page" href="library.html"><span class="rail-index">02</span><span><span class="rail-title">本地资料库</span><span class="rail-subtitle">Library</span></span></a>
+        <a class="rail-link" href="state.html"><span class="rail-index">03</span><span><span class="rail-title">项目状态</span><span class="rail-subtitle">State</span></span></a>
+        <a class="rail-link" href="memory.html"><span class="rail-index">04</span><span><span class="rail-title">项目上下文</span><span class="rail-subtitle">Memory</span></span></a>
+        <a class="rail-link" href="knowledge.html"><span class="rail-index">05</span><span><span class="rail-title">Obsidian 图谱</span><span class="rail-subtitle">Connect</span></span></a>
+      </nav>
+      <div class="rail-spacer"></div>
+      <div class="rail-local"><strong>证据与索引分离</strong><p>搜索索引可以重建，原始证据不会被索引操作改写。</p></div>
+    </aside>
+
+    <div class="app-stage">
+      <header class="page-head">
+        <div class="page-heading"><div class="eyebrow">KV ARCHIVE · LIBRARY / 02</div><h1>本地对话资料库</h1><p>跨备份批次搜索对话、代码与项目证据。阅读索引与原始证据分离，便于重建、迁移和核验。</p></div>
+        <div class="top-actions">
+          <label class="import-button"><input id="files" type="file" accept=".zip,.json,application/zip,application/json" multiple>导入备份</label>
+          <button id="agent-export" class="secondary">导出 Agent 接力包</button>
+          <button id="clear" class="ghost">清空会话索引</button>
+        </div>
+        <p id="agent-scope" class="agent-scope">接力包按来源、Project、归档状态和日期导出完整对话；关键词与角色仅用于屏幕检索。</p>
+      </header>
+
+      <main class="shell">
+        <div class="provenance-strip"><span><strong>支持来源：</strong>KV Archive ZIP · 全部分卷 · OpenAI 官方导出</span><span>所有内容只保存在当前浏览器</span></div>
+
+        <section class="intro library-intro">
+          <div class="intro-copy"><span class="phase">LOCAL EVIDENCE INDEX</span><h2>导入一次，之后按项目和正文重新找到</h2><p>原始证据、搜索索引、项目状态与 Agent 接力保持独立。清理索引不会改写备份文件。</p></div>
+          <div id="import-status" class="status status-capsule">尚未导入文件。</div>
+        </section>
+
+        <section class="metrics" aria-label="资料库统计">
+          <div><span>对话</span><strong id="metric-conversations">0</strong></div>
+          <div><span>消息</span><strong id="metric-messages">0</strong></div>
+          <div><span>证据版本</span><strong id="metric-evidence">0</strong></div>
+          <div><span>导入批次</span><strong id="metric-imports">0</strong></div>
+        </section>
+
+        <section class="search-panel">
+          <div class="search-head"><div><span class="phase">SEARCH / RETRIEVE</span><h2>检索历史内容</h2></div><a class="button-link ghost" href="memory.html">进入项目上下文</a></div>
+          <div class="search-row"><input id="query" type="search" placeholder="搜索对话正文、代码、标题或关键决策…" autocomplete="off"><button id="search">搜索</button></div>
+          <div class="filters">
+            <label>来源<select id="source"><option value="all">全部</option><option value="context-vault">KV Archive</option><option value="openai-official">OpenAI 官方导出</option></select></label>
+            <label>项目<select id="project"><option value="all">全部</option></select></label>
+            <label>角色<select id="role"><option value="all">全部</option><option value="user">用户</option><option value="assistant">助手</option><option value="system">系统</option><option value="tool">工具</option></select></label>
+            <label>状态<select id="archived"><option value="all">全部</option><option value="active">未归档</option><option value="archived">已归档</option></select></label>
+            <label>开始日期<input id="date-from" type="date"></label>
+            <label>结束日期<input id="date-to" type="date"></label>
+          </div>
+        </section>
+
+        <section class="results-head"><div><span class="phase">RESULT SET</span><h2 id="results-title">最近对话</h2><p id="results-summary">导入后即可搜索。</p></div><span class="result-guide">点击结果查看完整活动分支与历史分支</span></section>
+        <section id="results" class="results"><div class="empty"><strong>资料库还是空的</strong><span>导入 KV Archive 备份或 OpenAI 官方导出后，这里会出现最近对话与全文检索结果。</span><div class="empty-actions"><button type="button" data-library-action="import">选择备份文件</button><a class="button-link ghost" href="backup.html">前往备份中心</a></div></div></section>
+        <div class="load-more-row"><button id="load-more" class="secondary" type="button" hidden>加载更多结果</button></div>
+      </main>
+    </div>
+  </div>
+
+  <dialog id="detail">
+    <form method="dialog"><button class="close" aria-label="关闭">×</button></form>
+    <article id="detail-content"></article>
+  </dialog>
+  <script type="module" src="theme-manager.js"></script>
+  <script type="module" src="library.js"></script>
+</body>
+</html>

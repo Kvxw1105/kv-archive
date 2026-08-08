@@ -1,0 +1,6 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import { buildAssetIntegrityReport } from "../apps/extension/src/asset-integrity.js";
+
+test("asset integrity reports missing, unsupported and duplicate references",()=>{const job={assets:{inventory:[{key:"file:a",downloadable:true,expectedBytes:3,references:[{},{}]},{key:"file:b",downloadable:true,expectedBytes:4,references:[{}]},{key:"sandbox:c:/x",downloadable:false,expectedBytes:null,references:[{}]}],failures:[{key:"file:b",error:"failed"}]}};const report=buildAssetIntegrityReport(job,[{assetKey:"file:a",sizeBytes:3,bytes:Uint8Array.of(1,2,3)}]);assert.equal(report.status,"PARTIAL");assert.equal(report.downloaded,1);assert.equal(report.failed,1);assert.equal(report.unsupported,1);assert.equal(report.duplicateReferences,1);assert.deepEqual(report.missingKeys,["file:b"]);});
+test("ignores stale stored assets that are no longer present in inventory",()=>{const job={assets:{inventory:[{key:"file:current",downloadable:true,expectedBytes:2,references:[{}]}],failures:[]}};const report=buildAssetIntegrityReport(job,[{assetKey:"file:current",sizeBytes:2,bytes:Uint8Array.of(1,2)},{assetKey:"file:stale",sizeBytes:9,bytes:new Uint8Array(9)}]);assert.equal(report.status,"COMPLETE");assert.equal(report.downloaded,1);assert.equal(report.actualBytes,2);});

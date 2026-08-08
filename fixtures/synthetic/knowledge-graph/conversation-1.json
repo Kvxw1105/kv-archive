@@ -1,0 +1,35 @@
+{
+  "id": "conv-atlasdemo-001",
+  "title": "Voice-first foundation",
+  "create_time": 1785031200,
+  "update_time": 1785031800,
+  "current_node": "assistant-1",
+  "project_id": "project-atlasdemo",
+  "mapping": {
+    "root": { "id": "root", "parent": null, "children": ["user-1"], "message": null },
+    "user-1": {
+      "id": "user-1",
+      "parent": "root",
+      "children": ["assistant-1"],
+      "message": {
+        "id": "msg-user-1",
+        "author": { "role": "user" },
+        "create_time": 1785031210,
+        "content": { "content_type": "text", "parts": ["Which timing source should be authoritative?"] },
+        "metadata": {}
+      }
+    },
+    "assistant-1": {
+      "id": "assistant-1",
+      "parent": "user-1",
+      "children": [],
+      "message": {
+        "id": "msg-assistant-1",
+        "author": { "role": "assistant" },
+        "create_time": 1785031220,
+        "content": { "content_type": "text", "parts": ["Voice and subtitle timing should be authoritative."] },
+        "metadata": { "model_slug": "synthetic-model" }
+      }
+    }
+  }
+}

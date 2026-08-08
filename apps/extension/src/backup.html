@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>KV Archive · 备份中心</title>
+    <script src="theme-bootstrap.js"></script>
+<link rel="stylesheet" href="ui.css">
+  <link rel="stylesheet" href="task-feedback.css">
+  <link rel="stylesheet" href="backup.css">
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="visibility.css">
+</head>
+<body>
+  <div class="app-frame">
+    <aside class="side-rail" aria-label="KV Archive 主导航">
+  <a class="brand-lockup" href="backup.html"><img src="icons/icon48.png" alt=""><span><span class="brand-name">KV Archive</span><span class="brand-note">Local continuity system</span></span></a>
+  <div class="rail-label">Workspace</div>
+  <nav class="rail-nav">
+    <a class="rail-link" aria-current="page" href="backup.html"><span class="rail-index">01</span><span><span class="rail-title">备份中心</span><span class="rail-subtitle">Capture</span></span></a>
+    <a class="rail-link" href="basket.html"><span class="rail-index">02</span><span><span class="rail-title">会话篮子</span><span class="rail-subtitle">Select</span></span></a>
+    <a class="rail-link" href="library.html"><span class="rail-index">02</span><span><span class="rail-title">本地资料库</span><span class="rail-subtitle">Library</span></span></a>
+    <a class="rail-link" href="state.html"><span class="rail-index">03</span><span><span class="rail-title">项目状态</span><span class="rail-subtitle">State</span></span></a>
+    <a class="rail-link" href="memory.html"><span class="rail-index">04</span><span><span class="rail-title">项目上下文</span><span class="rail-subtitle">Memory</span></span></a>
+    <a class="rail-link" href="knowledge.html"><span class="rail-index">05</span><span><span class="rail-title">Obsidian 图谱</span><span class="rail-subtitle">Connect</span></span></a>
+  </nav>
+  <div class="rail-spacer"></div>
+  <div class="rail-local"><strong>本地优先</strong><p>资料、索引和任务状态默认保存在当前浏览器，不上传 KV Archive 服务器。</p></div>
+</aside>
+    <div class="app-stage">
+      <header class="page-head">
+        <div class="page-heading">
+          <div class="eyebrow">KV ARCHIVE · CAPTURE / 01</div>
+          <h1>平台备份中心</h1>
+          <p>当前高保真历史适配为 ChatGPT：先把普通、归档与项目空间对话变成可恢复的本地档案；其他平台将按 Adapter 能力逐步接入。采集、快照与分卷彼此独立，意外关闭后仍可继续。</p>
+        </div>
+        <div id="connection" class="head-status connection">正在检查 ChatGPT 登录页…</div>
+      </header>
+
+      <main class="shell">
+        <div class="provenance-strip"><span><strong>当前能力：</strong>全量采集 · 增量快照 · 内容寻址 · 低内存分卷</span><span>数据范围由当前登录空间决定</span></div>
+
+        <section id="backup-health" class="card backup-health" data-tone="idle">
+          <div class="health-copy">
+            <span class="phase">BACKUP HEALTH</span>
+            <h2 id="health-title">正在检查备份状态…</h2>
+            <p id="health-detail">浏览器本地缓存和电脑备份文件是两层不同的保护。</p>
+          </div>
+          <div class="health-grid">
+            <div><span>浏览器本地</span><strong id="health-browser">正在检查</strong></div>
+            <div><span>电脑备份文件</span><strong id="health-computer">正在检查</strong></div>
+            <div><span>浏览器存储</span><strong id="health-storage">正在估算</strong></div>
+            <div><span>持久化保护</span><strong id="health-persisted">正在检查</strong></div>
+          </div>
+          <button id="health-action" class="secondary">查看下一步</button>
+        </section>
+
+        <section class="card workspace-card">
+          <div class="section-index"><span>01A</span><div><span class="phase">BACKUP SPACE</span><h2>选择平台账号空间</h2></div></div>
+          <div class="workspace-control">
+            <select id="workspace" aria-label="平台账号空间"><option value="">个人空间</option></select>
+            <p id="workspace-help">会自动读取当前登录账号可用的空间；授权只存在于本次运行内存中。</p>
+          </div>
+        </section>
+
+        <details class="card schedule-card advanced-surface">
+          <summary class="advanced-summary"><span><span class="phase">AUTOMATION</span><strong>定时增量备份</strong></span><span>按需展开</span></summary>
+          <div class="schedule-body">
+          <div class="schedule-head">
+            <p>只扫描新增或变更内容，不自动生成完整 ZIP。成功后建立逻辑快照，重复内容不会再次占用一份存储。</p>
+            <label class="switch-row"><input id="schedule-enabled" type="checkbox"><span>启用</span></label>
+          </div>
+          <div class="schedule-grid">
+            <label><span>执行频率</span><select id="schedule-frequency"><option value="1">每天</option><option value="3">每 3 天</option><option value="7">每周</option><option value="30">每 30 天</option></select></label>
+            <label><span>本地时间</span><input id="schedule-time" type="time" value="03:30"></label>
+            <label><span>附件策略</span><select id="schedule-assets"><option value="references-only">仅保存附件引用（推荐）</option><option value="download">同时下载新增附件</option></select></label>
+            <label><span>最多保留快照</span><input id="schedule-retention-count" type="number" min="1" max="365" value="30"></label>
+            <label><span>最长保留天数</span><input id="schedule-retention-days" type="number" min="1" max="3650" value="180"></label>
+            <label class="check-row"><input id="schedule-idle" type="checkbox" checked><span>仅在浏览器空闲时启动</span></label>
+          </div>
+          <div class="schedule-summary">
+            <div><span>下次运行</span><strong id="schedule-next">未启用</strong></div>
+            <div><span>上次成功</span><strong id="schedule-last">尚无</strong></div>
+            <div><span>逻辑快照</span><strong id="schedule-snapshots">0</strong></div>
+            <div><span>最近变化</span><strong id="schedule-delta">+0 · ~0 · −0</strong></div>
+            <div><span>本轮复用节省</span><strong id="schedule-dedup">0 B</strong></div>
+            <div><span>当前状态</span><strong id="schedule-state">未启用</strong></div>
+          </div>
+          <p id="schedule-message" class="status inline-note">浏览器关闭时会错过准确时刻，但下次启动后会自动补跑。必须保留一个已登录的 ChatGPT 标签页。</p>
+          <div class="actions">
+            <button id="schedule-save" class="primary">保存定时设置</button>
+            <button id="schedule-run" class="secondary">立即增量运行一次</button>
+            <button id="schedule-refresh" class="ghost">刷新状态</button>
+          </div>
+          <section class="schedule-test-panel" aria-labelledby="schedule-test-title">
+            <div class="schedule-test-copy">
+              <span class="phase">TEN-MINUTE ACCEPTANCE</span>
+              <h3 id="schedule-test-title">10 分钟自动增量验收</h3>
+              <p>先保留一份基线快照，然后在 10 分钟内新建或编辑一条 ChatGPT 会话。到时扩展会由 Chrome Alarm 自动唤醒并运行增量检查。</p>
+            </div>
+            <div class="schedule-summary schedule-test-summary">
+              <div><span>验收状态</span><strong id="schedule-test-state">未启动</strong></div>
+              <div><span>自动触发时间</span><strong id="schedule-test-due">尚无</strong></div>
+              <div><span>剩余时间</span><strong id="schedule-test-countdown">尚无</strong></div>
+              <div><span>检测结果</span><strong id="schedule-test-result">尚无</strong></div>
+            </div>
+            <div id="schedule-test-progress" class="schedule-test-progress" hidden><div class="schedule-test-progress__track"><span id="schedule-test-progress-bar"></span></div><small id="schedule-test-progress-label">等待开始</small></div>
+            <p id="schedule-test-message" class="status inline-note">需要至少一份逻辑快照作为比较基线。测试期间可以关闭 KV Archive 页面，但应保持 Chrome 运行并保留一个已登录 ChatGPT 标签页。</p>
+            <div class="actions">
+              <button id="schedule-test-start" class="secondary">开始 10 分钟验收</button>
+              <button id="schedule-test-cancel" class="ghost" disabled>取消待运行验收</button>
+            </div>
+          </section>
+          </div>
+        </details>
+
+        <details class="card detailed-metrics">
+          <summary><span><span class="phase">DETAILED COUNTS</span><strong>详细统计</strong></span><span id="metrics-summary">尚无备份数据</span></summary>
+          <section class="overview metrics" aria-label="备份统计">
+            <div class="metric"><span>普通会话</span><strong id="regular">0</strong></div>
+            <div class="metric"><span>归档会话</span><strong id="archived">0</strong></div>
+            <div class="metric"><span>项目与空间</span><strong id="projects">0</strong></div>
+            <div class="metric"><span>项目会话</span><strong id="project-conversations">0</strong></div>
+            <div class="metric"><span>对话已保存</span><strong id="completed">0</strong></div>
+            <div class="metric"><span>附件发现</span><strong id="assets-discovered">0</strong></div>
+            <div class="metric"><span>附件已保存</span><strong id="assets-downloaded">0</strong></div>
+            <div class="metric"><span>附件失败</span><strong id="asset-failed">0</strong></div>
+            <div class="metric"><span>附件体积</span><strong><span id="asset-mb">0.0</span><small> MB</small></strong></div>
+            <div class="metric"><span>失败 / 重试</span><strong><span id="failed">0</span><small> / </small><span id="retries">0</span></strong></div>
+            <div class="metric"><span>分卷完成</span><strong id="archive-volumes">0 / 0</strong></div>
+          </section>
+        </details>
+
+        <section class="card progress-card">
+          <div class="progress-head">
+            <div class="section-index"><span>01C</span><div><span id="phase" class="phase">尚未开始</span><h2 id="current-title">准备备份</h2></div></div>
+            <strong id="percent">0%</strong>
+          </div>
+          <div class="bar" aria-hidden="true"><span id="bar"></span></div>
+          <p id="status" class="status">当前高保真 Adapter 需要保持一个已登录、且处于目标账号空间的 ChatGPT 标签页打开。</p>
+          <div id="backup-recovery-actions" class="recovery-actions" hidden>
+            <button id="recovery-primary" class="secondary"></button>
+            <button id="recovery-secondary" class="ghost"></button>
+          </div>
+          <section id="preflight-panel" class="preflight-panel" hidden>
+            <div class="preflight-head"><div><span class="phase">START CHECK</span><h3>开始前确认</h3></div><button id="preflight-close" class="text-button ghost" aria-label="关闭预检">关闭</button></div>
+            <dl>
+              <div><dt>平台账号空间</dt><dd id="preflight-workspace">—</dd></div>
+              <div><dt>预计对话</dt><dd id="preflight-conversations">开始后统计</dd></div>
+              <div><dt>Projects</dt><dd id="preflight-projects">开始后统计</dd></div>
+              <div><dt>附件策略</dt><dd id="preflight-assets">只保存引用</dd></div>
+              <div><dt>浏览器容量</dt><dd id="preflight-storage">正在估算</dd></div>
+            </dl>
+            <p id="preflight-note">这一步只做只读检查，不会修改 ChatGPT 中的内容。</p>
+            <div class="actions"><button id="preflight-confirm" class="primary">确认并开始</button><button id="preflight-cancel" class="ghost">暂不开始</button></div>
+          </section>
+          <div class="manual-backup-options">
+            <label>
+              <span>本次附件策略</span>
+              <select id="manual-assets">
+                <option value="references-only">只备份对话，附件仅记录引用（推荐）</option>
+                <option value="download">同时下载可访问附件</option>
+              </select>
+            </label>
+            <p>默认不下载附件二进制，避免无用文件占用浏览器本地空间。附件失败不会影响对话备份。</p>
+          </div>
+          <div class="actions action-cluster primary-actions">
+            <button id="start" class="primary">开始全量备份</button>
+            <button id="pause" class="secondary" disabled>暂停</button>
+            <button id="download" class="secondary" disabled>生成备份分卷</button>
+            <button id="library" class="secondary" disabled>加入本地资料库</button>
+          </div>
+          <details class="action-more">
+            <summary>更多操作与排错</summary>
+            <div class="actions action-cluster">
+              <button id="restart-download" class="ghost" disabled>重新生成全部分卷</button>
+              <button id="diagnostic" class="secondary" disabled>导出脱敏验收报告</button>
+              <button id="reset" class="ghost">清空进度</button>
+            </div>
+          </details>
+        </section>
+
+        <details class="card capability-drawer">
+          <summary><span><span class="phase">REFERENCE / CAPABILITY</span><strong>当前备份与快照能力</strong></span><span class="drawer-hint">展开技术范围 ＋</span></summary>
+          <div class="capability-body">
+            <ul>
+              <li>普通历史与归档会话的独立分页闭合</li><li>Projects 列表和每个 Project 的游标分页</li><li>个人空间与 Team／工作空间临时授权上下文</li><li>旧任务原地迁移，不重复已保存内容</li><li>用户上传文件、图片、DALL-E、代码解释器输出和 Project 文件</li><li>相同 fileId 全局去重，只保存一次，多个会话共享引用</li><li>附件大小与 SHA-256 校验、失败隔离和单独重试</li><li>约 12–24 MB 低内存分卷，每卷写盘后再处理下一卷</li><li>采集与打包分离，意外关闭后可继续剩余分卷</li><li>暂停、继续、登录失效保护和旧任务迁移</li><li>完成后可直接加入本地资料库</li><li>每天、每 3 天、每周或每 30 天自动增量扫描</li><li>会话与附件二进制的 SHA-256 内容寻址</li><li>逻辑快照记录新增、更新、移除和未变化项</li><li>快照保留策略和无引用对象回收</li>
+            </ul>
+            <p class="notice">全量采集完成后不会自动打包。点击“生成低内存备份分卷”后，系统一次只构建并下载一卷，写盘完成后立即释放内存。当前单个附件安全上限会按设备内存设为 16–32 MB。</p>
+          </div>
+        </details>
+
+        <details class="card log-card compact-drawer">
+          <summary><span><span class="phase">RUN LEDGER</span><strong>执行记录</strong></span><span>按需展开</span></summary>
+          <div class="section-head"><span class="muted-copy">用于排错和查看本次运行过程。</span><button id="clear-log" class="text-button ghost">清空显示</button></div>
+          <ol id="log" class="log"></ol>
+        </details>
+      </main>
+    </div>
+  </div>
+  <script type="module" src="theme-manager.js"></script>
+  <script type="module" src="backup.js"></script>
+</body>
+</html>

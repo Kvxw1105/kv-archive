@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>KV Archive · 项目上下文</title>
+    <script src="theme-bootstrap.js"></script>
+<link rel="stylesheet" href="ui.css">
+  <link rel="stylesheet" href="task-feedback.css">
+  <link rel="stylesheet" href="memory.css">
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="visibility.css">
+</head>
+<body>
+  <div class="app-frame">
+    <aside class="side-rail" aria-label="KV Archive 主导航">
+      <a class="brand-lockup" href="backup.html"><img src="icons/icon48.png" alt=""><span><span class="brand-name">KV Archive</span><span class="brand-note">Local continuity system</span></span></a>
+      <div class="rail-label">Workspace</div>
+      <nav class="rail-nav">
+        <a class="rail-link" href="backup.html"><span class="rail-index">01</span><span><span class="rail-title">备份中心</span><span class="rail-subtitle">Capture</span></span></a>
+        <a class="rail-link" href="basket.html"><span class="rail-index">02</span><span><span class="rail-title">会话篮子</span><span class="rail-subtitle">Select</span></span></a>
+        <a class="rail-link" href="library.html"><span class="rail-index">02</span><span><span class="rail-title">本地资料库</span><span class="rail-subtitle">Library</span></span></a>
+        <a class="rail-link" href="state.html"><span class="rail-index">03</span><span><span class="rail-title">项目状态</span><span class="rail-subtitle">State</span></span></a>
+        <a class="rail-link" aria-current="page" href="memory.html"><span class="rail-index">04</span><span><span class="rail-title">项目上下文</span><span class="rail-subtitle">Memory</span></span></a>
+        <a class="rail-link" href="knowledge.html"><span class="rail-index">05</span><span><span class="rail-title">Obsidian 图谱</span><span class="rail-subtitle">Connect</span></span></a>
+      </nav>
+      <div class="rail-spacer"></div>
+      <div class="rail-local"><strong>人工准入</strong><p>候选记忆不会静默写入 ChatGPT。核心与 Project 记忆必须审阅后批准。</p></div>
+    </aside>
+
+    <div class="app-stage">
+      <header class="page-head">
+        <div class="page-heading"><div class="eyebrow">KV ARCHIVE · MEMORY / 04</div><h1>项目上下文</h1><p>把某个工作项目中已经确认的资料、决策和任务整理成一份可交给新 AI 的上下文。它不会自动写入 ChatGPT 官方记忆。</p></div>
+        <div class="head-status">Review before use</div>
+      </header>
+
+      <main class="shell">
+        <section class="card memory-explainer">
+          <div><span class="phase">WHAT THIS DOES</span><h2>这不是 ChatGPT 官方“记忆同步”</h2><p>这里做的是本地上下文整理：选定一个 Project，只读取这个范围里的已确认状态和证据，再生成可复制、可插入或可导出的内容包。</p></div>
+          <details><summary>Project 是什么，为什么需要选择？</summary><p><strong>Project 就是本地工作范围。</strong>同一项目的会话、笔记、决策、任务和证据会放在一起。强制限定范围，是为了防止把不同项目的信息混给 AI。</p><p>Project 可以来自 ChatGPT Project 会话，也可以来自记录中心中带有 Project 的笔记。若只有一个 Project，页面会自动选择；多次打开也会记住上次选择。</p><div class="explainer-actions"><a href="basket.html">从会话篮子导入</a><a href="capture.html">去记录中心</a><a href="state.html">查看项目状态</a></div></details>
+        </section>
+        <div class="process-rail" aria-label="记忆生成流程">
+          <span><i>01</i>选择项目</span><b></b><span><i>02</i>生成候选</span><b></b><span><i>03</i>检查差异</span><b></b><span><i>04</i>批准或插入</span>
+        </div>
+
+        <section class="controls card">
+          <div class="control-title"><span class="phase">MEMORY COMPILER</span><h2>生成候选记忆</h2></div>
+          <label>工作范围（Project）<select id="project"><option value="">请选择 Project</option></select><small id="project-help">选择后只使用该范围的数据，不会混入其他项目。</small></label>
+          <label>输出类型<select id="mode"><option value="core">项目核心摘要</option><option value="project">项目完整上下文</option><option value="task">本次任务上下文</option></select></label>
+          <label>预算<select id="budget"><option value="2048">2K</option><option value="8192" selected>8K</option><option value="32768">32K</option></select></label>
+          <label class="query">当前任务或问题<input id="query" placeholder="任务模式需要填写；Project 模式可留空"></label>
+          <button id="generate">生成候选记忆</button>
+        </section>
+
+        <section class="summary" aria-label="记忆统计">
+          <div><span>已批准版本</span><strong id="approved-version">—</strong></div>
+          <div><span>候选 Token</span><strong id="tokens">0</strong></div>
+          <div><span>证据引用</span><strong id="sources">0</strong></div>
+          <div><span>变更行</span><strong id="changes">0</strong></div>
+        </section>
+
+
+        <section class="card gate-panel" aria-labelledby="gate-title">
+          <div class="panel-head gate-head">
+            <div><span class="phase">MEMORY GATE</span><h2 id="gate-title">记忆准入审核</h2><p id="gate-status">选择 Project 后运行。Gate 只生成审核结果与回执，不修改已批准项目状态。</p></div>
+            <div class="actions"><button id="run-gate">运行 Gate</button><button id="export-gate" class="ghost" disabled>导出回执</button></div>
+          </div>
+          <div class="gate-controls">
+            <label>策略<select id="gate-policy"><option value="safe">Safe · 严格证据</option><option value="balanced" selected>Balanced · 默认</option><option value="broad">Broad · 探索</option></select></label>
+            <label>使用目标<select id="gate-target"><option value="internal" selected>内部 Agent / 项目</option><option value="external">外部交付</option></select></label>
+            <label>Gate 预算<select id="gate-budget"><option value="512">512</option><option value="2048" selected>2K</option><option value="8192">8K</option><option value="32768">32K</option></select></label>
+            <div class="gate-summary" aria-label="Gate 结果统计"><span class="include">纳入 <strong id="gate-include">0</strong></span><span class="review">复核 <strong id="gate-review">0</strong></span><span class="exclude">排除 <strong id="gate-exclude">0</strong></span><span>Token <strong id="gate-tokens">0</strong></span></div>
+          </div>
+          <div class="gate-table-wrap">
+            <table class="gate-table"><thead><tr><th>判定</th><th>候选记忆</th><th>类型</th><th>原因 / 警告</th><th>证据</th><th>Token</th></tr></thead><tbody id="gate-results"><tr><td colspan="6" class="empty">尚未运行 Memory Gate。</td></tr></tbody></table>
+          </div>
+          <div class="gate-ledger"><div><span class="phase">RUN RECEIPTS</span><h3>运行回执与策略恢复</h3></div><div id="gate-runs" class="gate-runs"><div class="empty">暂无运行回执。</div></div></div>
+        </section>
+
+        <section class="workspace">
+          <article class="card preview-panel">
+            <div class="panel-head">
+              <div><span class="phase">CANDIDATE MEMORY</span><h2>候选内容</h2><p id="status">请选择 Project 后生成。</p></div>
+              <div class="actions"><button id="copy" class="ghost" disabled>复制</button><button id="insert" class="secondary" disabled>插入 ChatGPT</button><button id="approve" disabled>批准为项目记忆</button><button id="export" class="ghost" disabled>导出已批准记忆包</button></div>
+            </div>
+            <div class="editor-frame"><div class="editor-gutter"><span>MD</span><span>LOCAL</span></div><pre id="preview"></pre></div>
+          </article>
+          <aside class="card diff-panel">
+            <div class="panel-section"><span class="phase">CHANGE REVIEW</span><h2>与已批准版本的差异</h2><div id="diff" class="empty">尚未生成候选。</div></div>
+            <div class="panel-section versions-section"><span class="phase">VERSION LEDGER</span><h3>历史版本</h3><div id="versions" class="versions"><div class="empty">暂无历史版本。</div></div></div>
+          </aside>
+        </section>
+      </main>
+    </div>
+  </div>
+  <script type="module" src="theme-manager.js"></script>
+  <script type="module" src="memory.js"></script>
+</body>
+</html>

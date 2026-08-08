@@ -1,0 +1,91 @@
+{
+  "id": "conv-synthetic-001",
+  "title": "ContextVault Synthetic Branch Test",
+  "create_time": 1785031200,
+  "update_time": 1785031800,
+  "current_node": "assistant-active",
+  "metadata": {
+    "fixture": true,
+    "containsPrivateData": false
+  },
+  "mapping": {
+    "root": {
+      "id": "root",
+      "parent": null,
+      "children": ["user-1"],
+      "message": null
+    },
+    "user-1": {
+      "id": "user-1",
+      "parent": "root",
+      "children": ["assistant-active", "assistant-history"],
+      "message": {
+        "id": "msg-user-1",
+        "author": { "role": "user" },
+        "create_time": 1785031210,
+        "content": {
+          "content_type": "text",
+          "parts": ["Please show a deterministic TypeScript example."]
+        },
+        "metadata": {}
+      }
+    },
+    "assistant-active": {
+      "id": "assistant-active",
+      "parent": "user-1",
+      "children": [],
+      "message": {
+        "id": "msg-assistant-active",
+        "author": { "role": "assistant" },
+        "create_time": 1785031220,
+        "content": {
+          "content_type": "text",
+          "parts": [
+            "Here is the active answer.",
+            {
+              "type": "code",
+              "language": "ts",
+              "text": "const stable = true;"
+            },
+            {
+              "type": "future_widget",
+              "payload": { "value": 42 },
+              "text": "A future content type"
+            }
+          ]
+        },
+        "metadata": { "model_slug": "synthetic-model" }
+      }
+    },
+    "assistant-history": {
+      "id": "assistant-history",
+      "parent": "user-1",
+      "children": [],
+      "message": {
+        "id": "msg-assistant-history",
+        "author": { "role": "assistant" },
+        "create_time": 1785031230,
+        "content": {
+          "content_type": "text",
+          "parts": ["This is a non-active regenerated answer."]
+        },
+        "metadata": { "model_slug": "synthetic-model" }
+      }
+    },
+    "orphan": {
+      "id": "orphan",
+      "parent": "missing-parent",
+      "children": [],
+      "message": {
+        "id": "msg-orphan",
+        "author": { "role": "system" },
+        "create_time": 1785031240,
+        "content": {
+          "content_type": "mystery_payload",
+          "parts": [{ "opaque": true, "value": "preserve me" }]
+        },
+        "metadata": {}
+      }
+    }
+  }
+}

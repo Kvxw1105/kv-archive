@@ -1,0 +1,42 @@
+{
+  "name": "kv-archive",
+  "version": "0.16.11",
+  "private": true,
+  "type": "module",
+  "description": "Local-first AI conversation archive with readable exports, evidence-preserving backups, reviewed memory sync, Agent handoff, and Obsidian knowledge graph delivery.",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "clean": "node scripts/clean.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "build:core": "tsc -p tsconfig.json",
+    "build:extension": "node scripts/build-extension.mjs",
+    "build": "npm run clean && npm run build:core && npm run build:extension && npm run build:pwa && npm run build:agent",
+    "test": "npm run build && node --test tests/*.test.mjs",
+    "test:snapshots": "npm run build:core && node --test tests/snapshot.test.mjs",
+    "test:performance": "npm run build && node --expose-gc scripts/performance-smoke.mjs .tmp/performance-smoke.json",
+    "context-vault": "node dist/apps/cli/src/index.js",
+    "mvp": "npm run build && node dist/apps/cli/src/index.js normalize fixtures/synthetic/multi-branch-conversation.json --output .tmp/output",
+    "build:agent": "node scripts/build-agent-bridge.mjs",
+    "agent:serve": "node apps/agent-bridge/dist/agent/index.js serve",
+    "agent:inspect": "node apps/agent-bridge/dist/agent/index.js inspect",
+    "agent:pack": "node apps/agent-bridge/dist/agent/index.js pack",
+    "agent:propose": "node apps/agent-bridge/dist/agent/index.js propose",
+    "test:snapshot-performance": "npm run build:extension && node --expose-gc scripts/snapshot-performance-smoke.mjs .tmp/snapshot-performance-smoke.json",
+    "test:obsidian-performance": "npm run build && node --expose-gc scripts/obsidian-performance-smoke.mjs .tmp/obsidian-performance-smoke.json",
+    "test:capture-recovery-performance": "npm run build && node --expose-gc scripts/capture-recovery-performance-smoke.mjs .tmp/capture-recovery-performance.json",
+    "test:handoff-performance": "npm run build:agent && node --expose-gc scripts/verified-handoff-performance-smoke.mjs .tmp/verified-handoff-performance.json",
+    "build:pwa": "node scripts/build-pwa.mjs",
+    "serve:pwa": "node scripts/serve-pwa.mjs",
+    "test:pwa-performance": "npm run build:pwa && node scripts/pwa-performance-smoke.mjs .tmp/pwa-performance-smoke.json",
+    "test:conversation-chunk-performance": "npm run build:extension && node --expose-gc scripts/conversation-chunk-performance-smoke.mjs .tmp/conversation-chunk-performance-smoke.json"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

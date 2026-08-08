@@ -1,0 +1,14 @@
+{
+  "project": "REPLACE_WITH_PROJECT_ID_OR_TITLE",
+  "kind": "project_status",
+  "title": "Describe the reviewed state change",
+  "rationale": "Explain why the cited evidence supports this proposal.",
+  "expectedImpact": "Describe the expected effect after human approval.",
+  "riskLevel": "low",
+  "evidenceUris": [
+    "contextvault://conversation/REPLACE/node/REPLACE?evidence=REPLACE"
+  ],
+  "change": {
+    "phase": "REPLACE_WITH_NEW_PHASE"
+  }
+}

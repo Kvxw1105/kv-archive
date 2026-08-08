@@ -1,0 +1,13 @@
+{
+  "name": "kv-archive-agent-bridge",
+  "version": "0.16.11",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "kv-archive-agent": "dist/agent/index.js",
+    "context-vault-agent": "dist/agent/index.js"
+  }
+}
