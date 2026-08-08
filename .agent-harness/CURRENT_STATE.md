@@ -7,7 +7,8 @@ Date: `2026-08-09`
 Repository: `https://github.com/Kvxw1105/kv-archive` (public, branch `main`)  
 Baseline commit: `6d1028eb7b678147f59f0d6d303da5495fd2e399`  
 CI run: `31276928345` — https://github.com/Kvxw1105/kv-archive/actions/runs/31276928345  
-Release: `v0.16.11` pre-release — https://github.com/Kvxw1105/kv-archive/releases/tag/v0.16.11
+Release: `v0.16.11` pre-release — https://github.com/Kvxw1105/kv-archive/releases/tag/v0.16.11  
+Branch protection: ruleset `main-protection` active (pull_request + non_fast_forward + required `verify` check)
 
 ## Verified baseline facts
 
