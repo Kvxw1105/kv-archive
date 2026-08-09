@@ -103,6 +103,15 @@ test("visibility layer covers popup, dense pages, custom buttons, and waiting fe
   assert.match(serviceWorker, /visibility\.css/);
 });
 
+test("global link accent rule must not recolor button-styled anchors", async () => {
+  const css = await readFile("apps/extension/src/visibility.css", "utf8");
+  const rule = css.match(/a:not\([^{]*\)\s*\{[^}]*--kv-accent-strong/);
+  assert.ok(rule, "visibility.css should keep a global anchor accent rule");
+  for (const cls of [".button", ".button-link", ".import-button"]) {
+    assert.match(rule[0], new RegExp(`:not\\(\\${cls}\\)`), `anchor accent rule must exclude ${cls}`);
+  }
+});
+
 test("visibility hardening preserves hidden states and a 12px interactive-copy floor", async () => {
   const css = await readFile("apps/extension/src/visibility.css", "utf8");
   assert.match(css, /\[hidden\]\s*\{[\s\S]*display:\s*none\s*!important/);
