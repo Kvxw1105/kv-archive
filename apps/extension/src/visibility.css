@@ -277,7 +277,7 @@
 :root[data-theme] td { color: var(--kv-text); font-size: 13px; }
 :root[data-theme] code,
 :root[data-theme] pre { color: #f1f6f2; }
-:root[data-theme] a:not(.rail-link):not(.brand-lockup) { color: var(--kv-accent-strong); text-underline-offset: 3px; }
+:root[data-theme] a:not(.rail-link):not(.brand-lockup):not(.button):not(.button-link):not(.import-button) { color: var(--kv-accent-strong); text-underline-offset: 3px; }
 
 /* Theme picker is a functional control, not microcopy. */
 :root[data-theme] .theme-control__head span { font-size: 13px; }
