@@ -11,6 +11,7 @@ import {
   decodeBase64Chunks,
   decodeBase64ChunkInto,
   createChatGPTTransport,
+  executeScriptWithTimeout,
 } from "../apps/extension/src/history-api.js";
 
 test("normalizes common and nested conversation list response shapes", () => {
@@ -130,5 +131,48 @@ test("refreshes ChatGPT auth context once after a long-running request receives 
     assert.equal(apiReads, 2);
   } finally {
     globalThis.chrome = previousChrome;
+  }
+});
+
+test("executeScriptWithTimeout rejects when the tab script never resolves", async () => {
+  const previousChrome = globalThis.chrome;
+  const previousNow = globalThis.performance?.now;
+  globalThis.chrome = {
+    scripting: {
+      executeScript: () => new Promise(() => {}), // never settles
+    },
+  };
+  try {
+    await assert.rejects(
+      executeScriptWithTimeout({ target: { tabId: 1 }, world: "MAIN", func: () => {} }, 50),
+      (error) => {
+        assert.equal(error.status, 408);
+        assert.match(error.message, /未在/);
+        return true;
+      },
+    );
+  } finally {
+    if (previousChrome === undefined) delete globalThis.chrome;
+    else globalThis.chrome = previousChrome;
+    if (previousNow === undefined) delete globalThis.performance?.now;
+  }
+});
+
+test("executeScriptWithTimeout returns the result when the tab script settles", async () => {
+  const previousChrome = globalThis.chrome;
+  globalThis.chrome = {
+    scripting: {
+      executeScript: async () => [{ result: { ok: true, value: 42 } }],
+    },
+  };
+  try {
+    const result = await executeScriptWithTimeout(
+      { target: { tabId: 1 }, world: "MAIN", func: () => 42 },
+      100,
+    );
+    assert.equal(result[0].result.value, 42);
+  } finally {
+    if (previousChrome === undefined) delete globalThis.chrome;
+    else globalThis.chrome = previousChrome;
   }
 });

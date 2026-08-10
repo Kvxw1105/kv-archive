@@ -13,6 +13,33 @@ export class HistoryApiError extends Error {
 const asArray = (value) => Array.isArray(value) ? value : [];
 const cleanText = (value) => typeof value === "string" ? value.trim() : "";
 
+const DEFAULT_EXECUTE_SCRIPT_TIMEOUT_MS = 60_000;
+
+/**
+ * chrome.scripting.executeScript does not resolve when the target page's
+ * renderer is busy or unresponsive (e.g. a backgrounded ChatGPT tab). Without a
+ * timeout, a single stuck call can hang an entire incremental job forever.
+ * Wrap every call so the caller always gets a terminal outcome.
+ */
+export async function executeScriptWithTimeout(scriptOptions, timeoutMs = DEFAULT_EXECUTE_SCRIPT_TIMEOUT_MS) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), Math.max(50, Number(timeoutMs) || DEFAULT_EXECUTE_SCRIPT_TIMEOUT_MS));
+  try {
+    return await Promise.race([
+      chrome.scripting.executeScript(scriptOptions),
+      new Promise((_, reject) => {
+        controller.signal.addEventListener("abort", () => reject(new HistoryApiError(
+          `ChatGPT 页面未在 ${Math.round(timeoutMs / 1000)} 秒内响应，已跳过该请求。`,
+          { status: 408, url: String(scriptOptions?.args?.[0] ?? "") },
+        )), { once: true });
+      }),
+    ]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+
 export function normalizeConversationListResponse(payload) {
   const candidates = [
     payload,
@@ -217,7 +244,7 @@ export function normalizeAuthContext(session, pageState = {}) {
 }
 
 export async function discoverChatGPTAuthContext(tabId) {
-  const executions = await chrome.scripting.executeScript({
+  const executions = await executeScriptWithTimeout({
     target: { tabId },
     world: "MAIN",
     func: async () => {
@@ -267,7 +294,7 @@ export async function fetchJsonInChatGPTTab(tabId, path, options = {}) {
   if (authContext.deviceId) headers["oai-device-id"] = authContext.deviceId;
 
   const timeoutMs = Math.max(5_000, Number(options.timeoutMs ?? 60_000));
-  const executions = await chrome.scripting.executeScript({
+  const executions = await executeScriptWithTimeout({
     target: { tabId },
     world: "MAIN",
     func: async (requestPath, requestHeaders, requestTimeoutMs) => {
@@ -400,7 +427,7 @@ export async function fetchBinaryInChatGPTTab(tabId, url, options = {}) {
   const maxBytes = Number(options.maxBytes ?? 64 * 1024 * 1024);
   const chunkBytes = Math.max(64 * 1024, Math.min(Number(options.chunkBytes ?? 1024 * 1024), 4 * 1024 * 1024));
   const transferId = `contextvault-${globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`}`;
-  const initialExecutions = await chrome.scripting.executeScript({
+  const initialExecutions = await executeScriptWithTimeout({
     target: { tabId },
     world: "MAIN",
     func: async (downloadUrl, byteLimit, transferKey) => {
@@ -436,7 +463,7 @@ export async function fetchBinaryInChatGPTTab(tabId, url, options = {}) {
   try {
     for (let start = 0; start < initial.sizeBytes; start += chunkBytes) {
       const end = Math.min(initial.sizeBytes, start + chunkBytes);
-      const executions = await chrome.scripting.executeScript({
+      const executions = await executeScriptWithTimeout({
         target: { tabId },
         world: "MAIN",
         func: (transferKey, from, to) => {
@@ -458,7 +485,7 @@ export async function fetchBinaryInChatGPTTab(tabId, url, options = {}) {
       written += decoded;
     }
   } finally {
-    await chrome.scripting.executeScript({
+    await executeScriptWithTimeout({
       target: { tabId },
       world: "MAIN",
       func: (transferKey) => {
