@@ -115,3 +115,38 @@ Backup of prior version: D:\A-Project\Kvarchieve\KV-Archive-v0.16.9-extension-in
 - Newest snapshot readable after refresh/retention activity: 02:42 run
   created a new snapshot while previous ones remained (count 1 -> 3),
   no missing-content-object errors observed.
+
+
+## UI stale-state observation (2026-08-11 ~03:00-03:20)
+
+- After the 02:41 incremental completed (leveldb: status=success, completed,
+  snapshot b695f018), the Backup Center acceptance panel kept showing
+  "验收状态: 正在自动增量" and "Chrome Alarm 已触发，正在扫描和比较"
+  for 30+ minutes, with 检测结果: 尚无.
+- leveldb confirms no active run during that window (no new lastStartedAt;
+  schedule-runtime stayed success/completed).
+- Attempts to click 开始 10 分钟验收 (coordinate + pixel-located button)
+  produced no new schedule-test-runtime record and no UI change.
+- Interpretation: the acceptance panel renders from a UI/runtime snapshot
+  that was not refreshed after completion (stale display), and the start
+  button appears non-responsive while the panel is in that stale
+  "正在自动增量" state. Data layer is consistent (completed); this is a
+  display/state-sync issue, not a data-integrity issue.
+- Not filed as a defect PR (cosmetic display; needs reproduction on a
+  fresh page load). Flagged for follow-up: reload the page or restart the
+  extension before re-running acceptance.
+
+
+## Gate C large-library assessment (code + data layer, 2026-08-11)
+
+- Current store: LevelDB 244.7 MB / 137 files, Blob 8.9 MB / 11 files.
+- Conversation-node count ~3651, map-chunk ~328, manifest ~185 (v0.16.11
+  content-addressed incremental layout present).
+- library.js search: bounded via filters(limit = resultLimit + batch + 1)
+  with explicit load-more paging; results summary shows visible/hasMore.
+- detail view: long conversations batch-loaded (partitionDetailMessages,
+  DEFAULT_DETAIL_BATCH) to avoid rendering the whole corpus.
+- Conclusion: code-level evidence supports Gate C1 (no fixed hidden cap —
+  load-more continues) and C3 (bounded reads in search/detail hot paths).
+  Real large-library measurements (search latency at scale) remain
+  pending; current corpus is a medium library (~125 indexed conversations).
