@@ -40,10 +40,13 @@ The long ChatGPT web conversation is no longer the primary coding workspace. The
   - E (10-min Alarm): OBSERVED PASS — Alarm fired exactly at dueAt 02:12:05; incremental completed (slice-complete).
   - C (incremental detection): OBSERVED PASS — run at 02:41 completed success in 28s, 99 conversations processed, new snapshot created, logical snapshots 1 → 3.
   - C defect found + fixed: incremental job could hang forever in `project-conversations` phase when `chrome.scripting.executeScript` never resolves (busy/unresponsive ChatGPT tab). Fix: `executeScriptWithTimeout` (60s, 408 retryable) on all 5 call sites. Branch `fix/stuck-project-conversation-indexing`, PR #3, CI green.
+  - C second-round reuse evidence (本轮复用节省): **BLOCKED in this session** — owner sent a test message via bridge (2nd continuation) but the Backup Center start/run buttons were non-responsive in the stale "正在自动增量" panel; needs a fresh page load / extension reload and a manual run.
   - D (snapshot history): partial — new snapshot created while old retained (1→3), no missing-content errors.
-  - Remaining: second-conversation reuse evidence (本轮复用节省), missed-schedule catch-up.
+  - Gate C (large library): code-level evidence supports bounded search/detail reads (load-more paging, batch detail). Real latency measurements pending.
+  - UI stale-state observation: acceptance panel showed "正在自动增量" after completion (data layer completed); cosmetic display issue, flagged for follow-up.
+  - Remaining: reuse evidence after reload, missed-schedule catch-up.
 - ~~Real scheduler UI / 10-minute Alarm / missed-run catch-up~~ → **10-min Alarm PASS; missed-run catch-up pending**.
-- ~~Real old long conversation continued twice with observed node reuse~~ → **first continuation observed (99 conversations processed); positive node/byte reuse pending second run**.
+- ~~Real old long conversation continued twice with observed node reuse~~ → **first continuation observed (99 conversations processed); positive node/byte reuse pending after reload**.
 - Real large-library search/Project export measurements.
 - Real mobile PWA, Obsidian and external-Agent acceptance.
 - Git commit/push/PR/CI/release evidence after repository bootstrap → **PR #3 OPEN (fix), CI green; branch protection active**.
