@@ -48,3 +48,14 @@ TASK-030 must create the public repository without silently changing product beh
 ## Start instruction
 
 TASK-030 is complete. Next: execute `.agent-harness/prompts/01_REAL_BROWSER_ACCEPTANCE.md` as TASK-031 (real-browser reliability acceptance; fix only reproduced defects).
+
+## TASK-031 progress (2026-08-11)
+
+- A (in-place upgrade + data preserved): OBSERVED PASS.
+- B (scheduler UI): OBSERVED PASS — no `Cannot set properties of undefined`; logical snapshot 1 at start.
+- E (10-min Alarm): OBSERVED PASS — Alarm fired exactly at dueAt 02:12:05 (UTC 18:12:05Z), automatic incremental completed (slice-complete) at 18:13:27Z.
+- C (incremental detection): OBSERVED PASS — 02:41 run success in 28s, 99 conversations processed, new snapshot created (logical snapshots 1→3), UI 上次成功 02:42:03.
+- Reproduced defect: incremental job could hang forever in `project-conversations` phase when `chrome.scripting.executeScript` never resolves (busy/unresponsive ChatGPT tab; no timeout, no cancel). Fixed via `executeScriptWithTimeout` (60s, 408 retryable) on all 5 call sites; +2 regression tests; typecheck PASS; 297/297 tests PASS.
+- PR #3 open: https://github.com/Kvxw1105/kv-archive/pull/3 (verify check green).
+- Remaining for TASK-031: second-conversation reuse evidence (本轮复用节省), missed-schedule catch-up (错过补跑), large-library measurements.
+- Evidence log: `.agent-harness/evidence/TASK-031-AB-EVIDENCE.md` (redacted).

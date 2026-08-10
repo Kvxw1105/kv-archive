@@ -34,25 +34,33 @@ The long ChatGPT web conversation is no longer the primary coding workspace. The
 
 ## External acceptance still pending
 
-- Owner-profile Chrome in-place v0.16.10 → v0.16.11 acceptance.
-- Real scheduler UI / 10-minute Alarm / missed-run catch-up.
-- Real old long conversation continued twice with observed node reuse.
+- ~~Owner-profile Chrome in-place v0.16.10 → v0.16.11 acceptance~~ → **IN PROGRESS (TASK-031)**:
+  - A (in-place + data preserved): OBSERVED PASS (2026-08-11).
+  - B (scheduler UI): OBSERVED PASS — no `Cannot set properties of undefined`; logical snapshot 1.
+  - E (10-min Alarm): OBSERVED PASS — Alarm fired exactly at dueAt 02:12:05; incremental completed (slice-complete).
+  - C (incremental detection): OBSERVED PASS — run at 02:41 completed success in 28s, 99 conversations processed, new snapshot created, logical snapshots 1 → 3.
+  - C defect found + fixed: incremental job could hang forever in `project-conversations` phase when `chrome.scripting.executeScript` never resolves (busy/unresponsive ChatGPT tab). Fix: `executeScriptWithTimeout` (60s, 408 retryable) on all 5 call sites. Branch `fix/stuck-project-conversation-indexing`, PR #3, CI green.
+  - D (snapshot history): partial — new snapshot created while old retained (1→3), no missing-content errors.
+  - Remaining: second-conversation reuse evidence (本轮复用节省), missed-schedule catch-up.
+- ~~Real scheduler UI / 10-minute Alarm / missed-run catch-up~~ → **10-min Alarm PASS; missed-run catch-up pending**.
+- ~~Real old long conversation continued twice with observed node reuse~~ → **first continuation observed (99 conversations processed); positive node/byte reuse pending second run**.
 - Real large-library search/Project export measurements.
 - Real mobile PWA, Obsidian and external-Agent acceptance.
-- Git commit/push/PR/CI/release evidence after repository bootstrap.
+- Git commit/push/PR/CI/release evidence after repository bootstrap → **PR #3 OPEN (fix), CI green; branch protection active**.
 
 ## Active sequence
 
-1. TASK-030 — create/sanitize/push the public GitHub baseline and establish CI.
-2. TASK-031 — perform real-browser reliability acceptance; fix only reproduced defects.
-3. TASK-032 — freeze/audit the separate note-app prototype and design the Integration Bridge.
+1. TASK-030 — create/sanitize/push the public GitHub baseline and establish CI. ✅
+2. TASK-031 — real-browser reliability acceptance; fix only reproduced defects. **IN PROGRESS**
+   - A/B/E/C-OBSERVED PASS; defect (stuck incremental) found, fixed, PR #3 open.
+3. TASK-032 — freeze/audit the separate note-app prototype and design the Integration Bridge. (next)
 
 ## Current completion levels
 
 - EDITED: handoff/governance seed prepared outside Git history.
 - LOCALLY_VERIFIED: prepared GitHub seed revalidated: npm ci PASS, typecheck PASS, 294/294 tests PASS, 7/7 performance gates PASS.
-- COMMITTED: yes — baseline commit `6d1028e` on `main`.
-- PUSHED: yes — https://github.com/Kvxw1105/kv-archive
-- PR_UPDATED: n/a (initial baseline import; follow-up changes use branch/PR).
-- CI_PASSED: yes — run `31276928345` green on baseline SHA.
-- RELEASED: `v0.16.11` pre-release created (owner-profile acceptance still pending).
+- COMMITTED: yes — baseline commit `6d1028e` on `main`; fix commit `600b102` + docs `0bee498` on `fix/stuck-project-conversation-indexing`.
+- PUSHED: yes — https://github.com/Kvxw1105/kv-archive; fix branch pushed.
+- PR_UPDATED: **PR #3** open (fix: bound executeScript calls) — https://github.com/Kvxw1105/kv-archive/pull/3.
+- CI_PASSED: yes — baseline run `31276928345` green; PR #3 verify run `31417157329` green.
+- RELEASED: `v0.16.11` pre-release created (owner-profile acceptance in progress; A/B/E/C observed PASS).

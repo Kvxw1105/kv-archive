@@ -89,3 +89,29 @@ Backup of prior version: D:\A-Project\Kvarchieve\KV-Archive-v0.16.9-extension-in
 - 01C 状态: "本地采集完成" (previously "本地采集完成，但有待处理项" — pending items cleared).
 - PR #3 (executeScript timeout fix): state OPEN, mergeable, verify check SUCCESS
   (run 31417157329, 2026-08-10T18:03:39Z).
+
+
+## C. Incremental detection — OBSERVED PASS (owner-screenshot + leveldb)
+
+- Owner ran 立即增量运行一次 at ~02:41 local (screenshot evidence).
+- backup-schedule-runtime final record (latest log 003268.log):
+  status=success, lastStartedAt=2026-08-10T18:41:35.224Z,
+  lastSuccessfulAt=2026-08-10T18:42:03.438Z (= 02:42:03 local, matches UI),
+  jobStatus=completed, snapshotCreated=true,
+  snapshotId=snapshot-2026-08-10T18-41-35-854Z-b695f018aab5,
+  conversations=99 (UI: 上次处理 99 条对话), lastError absent.
+- UI (owner screenshot): 逻辑快照 3 (was 1 at acceptance B),
+  上次成功 2026/8/11 02:42:03, 增量备份已完成 (28 秒),
+  "Chrome Alarm 已触发，正在自动读取并比较增量".
+- This run completed successfully in 28s — the earlier project-conversations
+  stall did NOT recur, indicating the stall is intermittent (page-renderer
+  state dependent), and normal incremental path works.
+
+## D. Snapshot history safety — OBSERVED (partial)
+
+- Logical snapshots: baseline snapshot-2026-08-10T13-52-08-584Z-1d9ec23c9bbc
+  (from acceptance E baseline) + snapshot-2026-08-10T18-41-35-854Z-b695f018aab5
+  (newest). UI shows 逻辑快照 3.
+- Newest snapshot readable after refresh/retention activity: 02:42 run
+  created a new snapshot while previous ones remained (count 1 -> 3),
+  no missing-content-object errors observed.
