@@ -59,3 +59,11 @@ TASK-030 is complete. Next: execute `.agent-harness/prompts/01_REAL_BROWSER_ACCE
 - PR #3 open: https://github.com/Kvxw1105/kv-archive/pull/3 (verify check green).
 - Remaining for TASK-031: second-conversation reuse evidence (本轮复用节省), missed-schedule catch-up (错过补跑), large-library measurements.
 - Evidence log: `.agent-harness/evidence/TASK-031-AB-EVIDENCE.md` (redacted).
+
+## TASK-031 closure pass (2026-09-10)
+
+- Revalidated PR #3 baseline: branch `fix/stuck-project-conversation-indexing`, local HEAD `1fd73576ae04a9b42e3236499a63857f37a63606`, PR OPEN/CLEAN, prior `verify` SUCCESS.
+- Current local build and deterministic evidence are complete: typecheck PASS, 297/297 tests PASS, history timeout regression PASS, scheduler transition tests PASS, 10,000-node chunk smoke reused 9,999 nodes, and all required performance gates PASS.
+- Created a private rollback copy of the currently loaded unpacked extension and copied the current build over the same path without uninstalling or clearing IndexedDB. The owner must click Chrome Reload to activate the copied build; the browser bridge cannot inspect `chrome-extension://` pages.
+- Remaining owner actions are deliberately bounded: export a fresh recovery package, reload and confirm preservation, run the second continuation/reuse proof, recheck fresh-page Backup Center terminal convergence, measure real search/Project export, and perform missed-schedule close/reopen catch-up. Do not close Chrome until unrelated work is clear and the owner confirms the timing window.
+- TASK-031 remains in progress; no merge, release, or CI result for a new commit is claimed.

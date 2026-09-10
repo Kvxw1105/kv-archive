@@ -10,6 +10,13 @@ CI run: `31276928345` — https://github.com/Kvxw1105/kv-archive/actions/runs/31
 Release: `v0.16.11` pre-release — https://github.com/Kvxw1105/kv-archive/releases/tag/v0.16.11  
 Branch protection: ruleset `main-protection` active (pull_request + non_fast_forward + required `verify` check)
 
+## TASK-031 closure pass (2026-09-10)
+
+- Branch/PR baseline remains `fix/stuck-project-conversation-indexing` at `1fd73576ae04a9b42e3236499a63857f37a63606`; PR #3 is OPEN/CLEAN with prior `verify` SUCCESS.
+- Local verification is current: `npm ci`, typecheck, 297/297 deterministic tests, focused timeout/chunk/scheduler tests, 10,000-node reuse smoke (`9,999` reused), and all required performance gates passed.
+- The current extension build was copied over the existing unpacked-extension directory after a private rollback copy was created; extension ID and version remain unchanged, and no uninstall or IndexedDB clearing occurred. Owner Reload is still required before treating the copy as loaded.
+- TASK-031 remains IN PROGRESS. Real owner-profile proof is still pending for second-continuation physical reuse, fresh-page Backup Center terminal convergence, missed-schedule catch-up across Chrome close/reopen, and real large-library search/Project export latency. No CI claim is made for a new SHA until the scoped commit is pushed.
+
 ## Verified baseline facts
 
 - v0.16.11 locally passed 294/294 deterministic tests, TypeScript validation and seven performance gates before the development-mode transition.

@@ -2,8 +2,8 @@
 
 Date: 2026-08-11
 Extension ID: ccafhcejhlgdefoblkanefindomeecjd
-Installed path: D:\A-Project\Kvarchieve\KV-Archive-v0.16.9-extension-install (folder name legacy, content v0.16.11)
-Backup of prior version: D:\A-Project\Kvarchieve\KV-Archive-v0.16.9-extension-install.bak
+Installed path: `<PRIVATE_OWNER_EXTENSION_DIR>` (folder name legacy, content v0.16.11)
+Backup of prior version: `<PRIVATE_OWNER_EXTENSION_BACKUP_DIR>`
 
 ## A. In-place upgrade and preservation — OBSERVED PASS
 
@@ -150,3 +150,12 @@ Backup of prior version: D:\A-Project\Kvarchieve\KV-Archive-v0.16.9-extension-in
   load-more continues) and C3 (bounded reads in search/detail hot paths).
   Real large-library measurements (search latency at scale) remain
   pending; current corpus is a medium library (~125 indexed conversations).
+
+## Closure pass — 2026-09-10 (local and owner-action boundary)
+
+- PR baseline: branch `fix/stuck-project-conversation-indexing`, HEAD `1fd73576ae04a9b42e3236499a63857f37a63606`; PR #3 OPEN/CLEAN with prior `verify` SUCCESS.
+- Deterministic verification: `npm ci` PASS; `npm run typecheck` PASS; `npm test` PASS `297/297`; `node --test tests/history-api.test.mjs` PASS `11/11`; chunk tests PASS `6/6`; scheduler/integration/feedback tests PASS `13/13`; scheduler-core/back-up tests PASS `9/9`.
+- Reuse smoke: `nodeCount=10000`, `reusedNodes=9999`, `reuseRatio=0.9999`, `newlyRequiredNodeObjects=3`, `newlyRequiredMappingChunks=1`, `firstPlanMs=647`, `updatedPlanMs=540`, `rssMb=110`.
+- Required performance gates PASS: large archive `conversationCount=1200`, `volumeCount=29`, `elapsedMs=8503`; snapshot `conversationCount=3000`, `changedConversationCount=200`, `dedupSavedBytes=3932160`; Obsidian `status=COMPLETE`, `brokenLinks=0`; Capture Recovery `objectCount=3000`, `totalWrites=9000`, `canApply=true`; Handoff `objectCount=3000`, `preflightStatus=PASS`; PWA `totalRows=10000`, `filteredRows=96`, `elapsedMs=48.41`, all assertions true.
+- Private rollback copy exists outside the repository; current build was copied over the same unpacked-extension path without uninstalling or clearing IndexedDB. Current manifest version remains `0.16.11`; owner Reload is still required before treating this copy as active.
+- Owner-profile gates remain `BLOCKED`: fresh recovery-package export, second-continuation physical reuse, fresh-page stale-state convergence, real large-library latency/export measurements, and missed-schedule catch-up across a clean Chrome close/reopen. These are not inferred from deterministic tests.
