@@ -161,6 +161,6 @@ Run `git status --short`, `git diff --check`, and a scoped `git diff`. Confirm `
 Conversation Basket now restores every locally cached provider catalog and offers platform-aware grouping/filtering. ChatGPT remains the only verified batch full-history collector; unsupported or mixed-platform selections stop with an explicit explanation instead of entering the ChatGPT-only engine. IndexedDB v13 and existing selection keys remain unchanged.
 ```
 
-- [ ] **Step 3: Commit, push, and verify PR #3**
+- [x] **Step 3: Commit, push, and verify PR #3**
 
 Stage only Basket source, the aggregate module, scoped tests, state/handoff, and this plan. Commit `feat: classify basket conversations by provider`, push `fix/stuck-project-conversation-indexing`, confirm PR #3 head matches local HEAD, and wait for `gh pr checks 3 --repo Kvxw1105/kv-archive --watch` to report `verify` success. Do not merge or release.

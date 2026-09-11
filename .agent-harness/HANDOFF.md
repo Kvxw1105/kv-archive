@@ -77,4 +77,4 @@ TASK-030 is complete. Next: execute `.agent-harness/prompts/01_REAL_BROWSER_ACCE
 
 - Conversation Basket now restores every locally cached provider catalog and offers platform-aware grouping/filtering. ChatGPT remains the only verified batch full-history collector; unsupported or mixed-platform selections stop with an explicit explanation instead of entering the ChatGPT-only engine. IndexedDB v13 and existing selection keys remain unchanged.
 - Verification: focused provider/catalog/selection/UI regressions PASS; `npm run typecheck` PASS; `npm run build:extension` PASS at manifest `0.16.11`; `npm test` PASS. The user-owned unstaged `tests/pwa.test.mjs` change remains preserved.
-- Next: stage only the plan-listed Basket source, aggregate module, scoped tests, state/handoff and plan; commit/push the existing branch; verify PR #3's `verify` check belongs to the new head SHA. Do not merge or release.
+- Delivery: COMMITTED at `4c244bb1584673c225e8e93c59ec0d23de18bdb9`; PUSHED to `fix/stuck-project-conversation-indexing`; PR #3 remains OPEN with matching head; `verify` passed in run `34616452548`. Do not merge or release.
