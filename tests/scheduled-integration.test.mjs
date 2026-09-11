@@ -30,7 +30,35 @@ test("extension declares scheduler permissions, background hooks and backup cont
   for (const id of ["schedule-test-countdown", "schedule-test-progress", "schedule-test-progress-bar", "schedule-test-progress-label"]) {
     assert.match(idsBlock, new RegExp(`["']${id}["']`), `${id} must be registered before countdown rendering`);
   }
+  assert.match(backupSource, /scheduleStatusPresentation\(runtime\.status\)/);
+  assert.match(backupSource, /scheduleConfigurationSummary\(settings\)/);
+  assert.match(backupSource, /elements\["schedule-status-badge"\]\.dataset\.tone/);
+  assert.match(backupSource, /elements\["schedule-enable-action"\]\.hidden = Boolean\(settings\.enabled\)/);
+  assert.match(backupSource, /elements\["schedule-settings"\]\.open = true/);
   assert.match(backupSource, /if \(!countdown \|\| !progress \|\| !bar \|\| !label\) return;/);
+});
+
+test("scheduled backup is a first-class card while settings and acceptance stay progressive", async () => {
+  const html = await readFile("apps/extension/src/backup.html", "utf8");
+  const start = html.indexOf('<section id="automatic-backup"');
+  const end = html.indexOf('<section class="card workspace-card"', start);
+  assert.ok(start >= 0, "automatic backup needs an always-visible landmark");
+  assert.ok(end > start, "automatic backup must appear directly before workspace selection");
+
+  const card = html.slice(start, end);
+  assert.match(card, /class="card schedule-card schedule-primary"/);
+  assert.match(card, /id="schedule-status-badge"/);
+  assert.match(card, /id="schedule-state"/);
+  assert.match(card, /id="schedule-next"/);
+  assert.match(card, /id="schedule-last"/);
+  assert.match(card, /id="schedule-run"[^>]*>立即增量备份</);
+  assert.match(card, /id="schedule-refresh"/);
+  assert.match(card, /id="schedule-enable-action"/);
+  assert.match(card, /<details id="schedule-settings"/);
+  assert.match(card, /id="schedule-settings-summary"/);
+  assert.match(card, /<details class="schedule-tools"/);
+  assert.ok(card.indexOf('id="schedule-run"') < card.indexOf('id="schedule-settings"'));
+  assert.doesNotMatch(card, /<details class="card schedule-card advanced-surface"/);
 });
 
 test("manual backup releases its lease even when no ChatGPT tab is available", async () => {

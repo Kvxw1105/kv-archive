@@ -17,6 +17,11 @@ Branch protection: ruleset `main-protection` active (pull_request + non_fast_for
 - The current extension build was copied over the existing unpacked-extension directory after a private rollback copy was created; extension ID and version remain unchanged, and no uninstall or IndexedDB clearing occurred. Owner Reload is still required before treating the copy as loaded.
 - TASK-031 remains IN PROGRESS. Real owner-profile proof is still pending for second-continuation physical reuse, fresh-page Backup Center terminal convergence, missed-schedule catch-up across Chrome close/reopen, and real large-library search/Project export latency. No CI claim is made for a new SHA until the scoped commit is pushed.
 
+## Scheduled backup primary card (2026-09-11)
+
+- Scheduled incremental backup is now an always-visible Backup Center primary card; status, next/last run, reuse evidence, and immediate action no longer require expanding an advanced drawer. Settings and the 10-minute acceptance tool remain progressively disclosed. Scheduler storage/alarm contracts and DB v13 are unchanged.
+- Local evidence: `npm run typecheck` PASS; extension build PASS at manifest `0.16.11`; full deterministic suite PASS (`301/301`). The real owner-profile Reload and desktop/narrow visual check remains pending until actually observed.
+
 ## Verified baseline facts
 
 - v0.16.11 locally passed 294/294 deterministic tests, TypeScript validation and seven performance gates before the development-mode transition.

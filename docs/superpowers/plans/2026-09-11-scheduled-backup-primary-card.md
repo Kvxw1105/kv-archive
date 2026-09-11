@@ -36,7 +36,7 @@
 - Modify: `tests/scheduled-integration.test.mjs`
 - Modify: `tests/ui-shell.test.mjs`
 
-- [ ] **Step 1: Add the primary-card contract test**
+- [x] **Step 1: Add the primary-card contract test**
 
 Append this test to `tests/scheduled-integration.test.mjs`:
 
@@ -65,7 +65,7 @@ test("scheduled backup is a first-class card while settings and acceptance stay 
 });
 ```
 
-- [ ] **Step 2: Update the shell hierarchy assertion**
+- [x] **Step 2: Update the shell hierarchy assertion**
 
 In `tests/ui-shell.test.mjs`, replace:
 
@@ -81,7 +81,7 @@ assert.match(backup, /<details id="schedule-settings"/);
 assert.match(backup, /<details class="schedule-tools"/);
 ```
 
-- [ ] **Step 3: Run the tests and verify RED**
+- [x] **Step 3: Run the tests and verify RED**
 
 Run:
 
@@ -97,7 +97,7 @@ Expected: the new primary-card test fails because `automatic-backup` and its vis
 - Create: `apps/extension/src/schedule-presentation.js`
 - Create: `tests/schedule-presentation.test.mjs`
 
-- [ ] **Step 1: Write the presentation tests**
+- [x] **Step 1: Write the presentation tests**
 
 Create `tests/schedule-presentation.test.mjs`:
 
@@ -129,7 +129,7 @@ test("configuration summary stays compact and truthful", () => {
 });
 ```
 
-- [ ] **Step 2: Run the tests and verify RED**
+- [x] **Step 2: Run the tests and verify RED**
 
 Run:
 
@@ -139,7 +139,7 @@ node --test tests/schedule-presentation.test.mjs
 
 Expected: FAIL with `ERR_MODULE_NOT_FOUND` for `schedule-presentation.js`.
 
-- [ ] **Step 3: Implement the presentation module**
+- [x] **Step 3: Implement the presentation module**
 
 Create `apps/extension/src/schedule-presentation.js`:
 
@@ -168,7 +168,7 @@ export function scheduleConfigurationSummary(settings = {}) {
 }
 ```
 
-- [ ] **Step 4: Run the presentation tests and verify GREEN**
+- [x] **Step 4: Run the presentation tests and verify GREEN**
 
 Run:
 
@@ -183,7 +183,7 @@ Expected: 2/2 PASS.
 **Files:**
 - Modify: `apps/extension/src/backup.html:66-115`
 
-- [ ] **Step 1: Replace the outer scheduler disclosure**
+- [x] **Step 1: Replace the outer scheduler disclosure**
 
 Remove the complete existing outer scheduler `<details>` block. Insert this markup immediately after `</section>` for `id="backup-health"` and before `<section class="card workspace-card">`:
 
@@ -266,7 +266,7 @@ Remove the complete existing outer scheduler `<details>` block. Insert this mark
 
 Use the literal existing `schedule-grid` block in place of its comment and the literal existing `schedule-test-panel` block in place of its comment. Do not duplicate an ID. Renumber the workspace heading from `01A` to `01B` so page order remains intelligible.
 
-- [ ] **Step 2: Run the DOM contract tests**
+- [x] **Step 2: Run the DOM contract tests**
 
 Run:
 
@@ -282,7 +282,7 @@ Expected: primary-card hierarchy assertions pass; JS presentation wiring asserti
 - Modify: `apps/extension/src/backup.js:1-63,150-166,262-310,1103-1108`
 - Modify: `tests/scheduled-integration.test.mjs`
 
-- [ ] **Step 1: Add failing source-wiring assertions**
+- [x] **Step 1: Add failing source-wiring assertions**
 
 Inside the first test in `tests/scheduled-integration.test.mjs`, after reading `backupSource`, add:
 
@@ -302,7 +302,7 @@ node --test tests/scheduled-integration.test.mjs
 
 Expected: FAIL because the new presentation functions are not wired.
 
-- [ ] **Step 2: Import and register new elements**
+- [x] **Step 2: Import and register new elements**
 
 Add after existing imports in `apps/extension/src/backup.js`:
 
@@ -316,7 +316,7 @@ Add these IDs to the `ids` array:
 "automatic-backup", "schedule-status-badge", "schedule-enable-action", "schedule-settings", "schedule-settings-summary",
 ```
 
-- [ ] **Step 3: Render card state from the existing payload**
+- [x] **Step 3: Render card state from the existing payload**
 
 At the beginning of `renderScheduleStatus(payload)`, after `settings` and `runtime` are defined, add:
 
@@ -340,7 +340,7 @@ elements["schedule-status-badge"].dataset.tone = presentation.tone;
 
 Do not alter `scheduleStateLabel`, scheduler runtime values, polling, or message payloads.
 
-- [ ] **Step 4: Add the explicit setup interaction**
+- [x] **Step 4: Add the explicit setup interaction**
 
 Add next to the existing scheduler listeners:
 
@@ -356,7 +356,7 @@ elements["schedule-enable-action"].addEventListener("click", () => {
 
 This interaction exposes the choice but does not save silently.
 
-- [ ] **Step 5: Run presentation and integration tests**
+- [x] **Step 5: Run presentation and integration tests**
 
 Run:
 
@@ -372,7 +372,7 @@ Expected: all tests PASS. Existing ten-minute acceptance IDs and countdown guard
 - Modify: `apps/extension/src/backup.css`
 - Modify: `tests/ui-visibility.test.mjs`
 
-- [ ] **Step 1: Add failing CSS contract assertions**
+- [x] **Step 1: Add failing CSS contract assertions**
 
 Append to `tests/ui-visibility.test.mjs`:
 
@@ -399,7 +399,7 @@ node --test tests/ui-visibility.test.mjs
 
 Expected: FAIL because the primary-card selectors do not exist.
 
-- [ ] **Step 2: Replace obsolete outer-disclosure styles and add card styles**
+- [x] **Step 2: Replace obsolete outer-disclosure styles and add card styles**
 
 Keep shared `.schedule-grid`, `.schedule-summary`, `.inline-note`, and test-progress styles. Remove scheduler-only dependence on `.advanced-surface`, `.advanced-summary`, and `.schedule-body`, then add:
 
@@ -451,7 +451,7 @@ Extend the existing `@media (max-width: 420px)` block with:
 .schedule-summary-primary, .schedule-summary-evidence { grid-template-columns:1fr; }
 ```
 
-- [ ] **Step 3: Run UI tests and typecheck**
+- [x] **Step 3: Run UI tests and typecheck**
 
 Run:
 
@@ -469,7 +469,7 @@ Expected: all tests and typecheck PASS with no missing CSS token or hidden-state
 - Modify: `.agent-harness/HANDOFF.md`
 - Preserve unstaged: `tests/pwa.test.mjs`
 
-- [ ] **Step 1: Build and run the complete deterministic suite once**
+- [x] **Step 1: Build and run the complete deterministic suite once**
 
 Run:
 
@@ -480,7 +480,7 @@ npm test
 
 Expected: extension build PASS and 297 existing tests plus the newly added tests all PASS. Do not repeat the seven performance gates because this change does not touch performance/data paths and they already passed at commit `85f0a5a`.
 
-- [ ] **Step 2: Inspect the generated extension and diff**
+- [x] **Step 2: Inspect the generated extension and diff**
 
 Run:
 
@@ -494,7 +494,7 @@ git diff -- apps/extension/src tests/schedule-presentation.test.mjs tests/schedu
 
 Expected: manifest remains `0.16.11`; tracked source changes are scoped to this feature and state docs; `tests/pwa.test.mjs` remains unstaged and unchanged from its pre-task user modification; generated build files are not committed.
 
-- [ ] **Step 3: Update project state truthfully**
+- [x] **Step 3: Update project state truthfully**
 
 Add one concise milestone to `.agent-harness/CURRENT_STATE.md` and `.agent-harness/HANDOFF.md` stating:
 
@@ -504,7 +504,7 @@ Scheduled incremental backup is now an always-visible Backup Center primary card
 
 Record exact test counts and note that real owner-profile visual/reload acceptance remains pending until actually observed.
 
-- [ ] **Step 4: Commit only scoped implementation files**
+- [x] **Step 4: Commit only scoped implementation files**
 
 Run:
 

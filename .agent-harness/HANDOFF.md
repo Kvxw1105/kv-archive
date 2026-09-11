@@ -67,3 +67,8 @@ TASK-030 is complete. Next: execute `.agent-harness/prompts/01_REAL_BROWSER_ACCE
 - Created a private rollback copy of the currently loaded unpacked extension and copied the current build over the same path without uninstalling or clearing IndexedDB. The owner must click Chrome Reload to activate the copied build; the browser bridge cannot inspect `chrome-extension://` pages.
 - Remaining owner actions are deliberately bounded: export a fresh recovery package, reload and confirm preservation, run the second continuation/reuse proof, recheck fresh-page Backup Center terminal convergence, measure real search/Project export, and perform missed-schedule close/reopen catch-up. Do not close Chrome until unrelated work is clear and the owner confirms the timing window.
 - TASK-031 remains in progress; no merge, release, or CI result for a new commit is claimed.
+
+## Scheduled backup primary card (2026-09-11)
+
+- Scheduled incremental backup is now an always-visible Backup Center primary card; status, next/last run, reuse evidence, and immediate action no longer require expanding an advanced drawer. Settings and the 10-minute acceptance tool remain progressively disclosed. Scheduler storage/alarm contracts and DB v13 are unchanged.
+- Verification: `npm run typecheck` PASS; `npm run build:extension` PASS with manifest `0.16.11`; full deterministic suite PASS (`301/301`). Owner-profile Reload and desktop/narrow visual acceptance are still pending observation; do not claim them from source or build evidence.
