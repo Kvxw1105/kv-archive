@@ -52,6 +52,12 @@ test("selection sets deduplicate conversations and support filters and toggles",
   assert.equal(filterConversationRefs(selection.items, "", { collectionId: "p-1" }).length, 1);
 });
 
+test("selection filters preserve platform identity", () => {
+  const mixed = [...refs, { provider: "gemini", accountScopeId: "personal", conversationId: "g-1", title: "Gemini note", updatedAt: 1 }];
+  assert.deepEqual(filterConversationRefs(mixed, "", { provider: "gemini" }).map((item) => item.key), ["gemini:personal:g-1"]);
+  assert.deepEqual(new Set(createConversationSelectionSet({ title: "Mixed", refs: mixed }).items.map((item) => item.provider)), new Set(["chatgpt", "gemini"]));
+});
+
 test("selected conversation jobs preserve only the chosen complete conversations", () => {
   const selection = createConversationSelectionSet({ title: "Batch", provider: "chatgpt", accountScopeId: "ws-1", refs });
   const job = createSelectedConversationJob(selection);

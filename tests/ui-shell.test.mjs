@@ -89,3 +89,10 @@ test("Capture Center exposes portable dry-run recovery without weakening local-o
   assert.match(source, /analyzePortablePackage/);
   assert.match(source, /rollbackPortableImport/);
 });
+
+test("Conversation Basket exposes a real provider filter", async () => {
+  const basket = await readFile("apps/extension/src/basket.html", "utf8");
+  assert.match(basket, /id="provider"/);
+  assert.match(basket, /全部平台/);
+  assert.match(basket, /按平台分别采集/);
+});

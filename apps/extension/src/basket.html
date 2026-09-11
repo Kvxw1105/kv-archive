@@ -36,9 +36,10 @@
         <div class="provenance-strip"><span><strong>两步完成：</strong>先把会话采集并持续保存到浏览器，再把任意已保存成果导出为本地 ZIP。</span><span>暂停不会清空已保存内容</span></div>
 
         <section class="card basket-toolbar">
-          <div class="toolbar-copy"><span class="phase">CONVERSATION CATALOG</span><h2>选择会话</h2><p id="catalog-summary">首次读取后会缓存在本地；以后打开页面会立即恢复，只有需要最新内容时才刷新。</p></div>
+          <div class="toolbar-copy"><span class="phase">CONVERSATION CATALOG</span><h2>选择会话</h2><p id="catalog-summary">缓存的完整会话可按平台、项目与状态筛选；ChatGPT 当前支持批量采集，其他平台仅在存在真实目录或导入记录后显示，并须按平台分别采集。</p></div>
           <div class="toolbar-actions"><button id="load" class="primary">读取会话目录</button><button id="select-visible" class="secondary" disabled>全选当前结果</button><button id="clear-selection" class="ghost" disabled>清空选择</button></div>
           <div class="basket-filters">
+            <select id="provider" aria-label="平台筛选"><option value="">全部平台</option></select>
             <input id="query" type="search" placeholder="搜索会话标题…" autocomplete="off">
             <select id="collection"><option value="">全部项目与空间</option></select>
             <select id="scope"><option value="all">全部会话</option><option value="active">普通会话</option><option value="archived">归档会话</option></select>

@@ -72,3 +72,9 @@ TASK-030 is complete. Next: execute `.agent-harness/prompts/01_REAL_BROWSER_ACCE
 
 - Scheduled incremental backup is now an always-visible Backup Center primary card; status, next/last run, reuse evidence, and immediate action no longer require expanding an advanced drawer. Settings and the 10-minute acceptance tool remain progressively disclosed. Scheduler storage/alarm contracts and DB v13 are unchanged.
 - Verification: `npm run typecheck` PASS; `npm run build:extension` PASS with manifest `0.16.11`; full deterministic suite PASS (`301/301`). Owner-profile Reload and desktop/narrow visual acceptance are still pending observation; do not claim them from source or build evidence.
+
+## Conversation Basket provider classification (2026-09-11)
+
+- Conversation Basket now restores every locally cached provider catalog and offers platform-aware grouping/filtering. ChatGPT remains the only verified batch full-history collector; unsupported or mixed-platform selections stop with an explicit explanation instead of entering the ChatGPT-only engine. IndexedDB v13 and existing selection keys remain unchanged.
+- Verification: focused provider/catalog/selection/UI regressions PASS; `npm run typecheck` PASS; `npm run build:extension` PASS at manifest `0.16.11`; `npm test` PASS. The user-owned unstaged `tests/pwa.test.mjs` change remains preserved.
+- Next: stage only the plan-listed Basket source, aggregate module, scoped tests, state/handoff and plan; commit/push the existing branch; verify PR #3's `verify` check belongs to the new head SHA. Do not merge or release.

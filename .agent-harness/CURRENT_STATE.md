@@ -79,3 +79,9 @@ The long ChatGPT web conversation is no longer the primary coding workspace. The
 - PR_UPDATED: **PR #3** open (fix: bound executeScript calls) — https://github.com/Kvxw1105/kv-archive/pull/3.
 - CI_PASSED: yes — baseline run `31276928345` green; PR #3 verify run `31417157329` green.
 - RELEASED: `v0.16.11` pre-release created (owner-profile acceptance in progress; A/B/E/C observed PASS).
+
+## Conversation Basket provider classification (2026-09-11)
+
+- Conversation Basket now restores every locally cached provider catalog and offers platform-aware grouping/filtering. ChatGPT remains the only verified batch full-history collector; unsupported or mixed-platform selections stop with an explicit explanation instead of entering the ChatGPT-only engine. IndexedDB v13 and existing selection keys remain unchanged.
+- Verification: focused provider/catalog/selection/UI regressions PASS; `npm run typecheck` PASS; `npm run build:extension` PASS at manifest `0.16.11`; `npm test` PASS. The user-owned unstaged `tests/pwa.test.mjs` change remains preserved.
+- Git state: scoped changes are edited locally; commit/push/PR #3 verify CI for this SHA remain pending.
