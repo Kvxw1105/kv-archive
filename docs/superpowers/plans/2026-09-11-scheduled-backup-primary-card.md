@@ -517,7 +517,7 @@ git commit -m "feat: make scheduled backup a primary workflow"
 
 Expected: the commit excludes `tests/pwa.test.mjs` and any private/generated files.
 
-- [ ] **Step 5: Push and verify PR CI**
+- [x] **Step 5: Push and verify PR CI**
 
 Run:
 
