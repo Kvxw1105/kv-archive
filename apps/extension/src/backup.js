@@ -11,6 +11,7 @@ import { createLogicalSnapshot } from "./content-snapshots.js";
 import { createIndexedDbSnapshotStore } from "./snapshot-store.js";
 import { buildBackupPreflight, classifyRecoveryAction, deriveBackupHealth } from "./ux-guidance.js";
 import { createTaskFeedback } from "./task-feedback.js";
+import { scheduleConfigurationSummary, scheduleStatusPresentation } from "./schedule-presentation.js";
 
 const store = createIndexedDbHistoryStore();
 const libraryStore = createIndexedDbLibraryStore();
@@ -49,6 +50,7 @@ const ids = [
   "current-title", "percent", "bar", "status", "start", "pause", "download",
   "restart-download", "diagnostic", "library", "reset", "log", "clear-log",
   "manual-assets",
+  "automatic-backup", "schedule-status-badge", "schedule-enable-action", "schedule-settings", "schedule-settings-summary",
   "schedule-enabled", "schedule-frequency", "schedule-time", "schedule-assets",
   "schedule-retention-count", "schedule-retention-days", "schedule-idle", "schedule-next",
   "schedule-last", "schedule-snapshots", "schedule-delta", "schedule-dedup", "schedule-state", "schedule-message",
@@ -263,6 +265,12 @@ function renderScheduleStatus(payload) {
   latestSchedulePayload = payload;
   const settings = payload?.settings ?? {};
   const runtime = payload?.runtime ?? {};
+  const presentation = scheduleStatusPresentation(runtime.status);
+  elements["automatic-backup"].dataset.state = runtime.status || "unknown";
+  elements["schedule-status-badge"].textContent = presentation.label;
+  elements["schedule-status-badge"].dataset.tone = presentation.tone;
+  elements["schedule-settings-summary"].textContent = scheduleConfigurationSummary(settings);
+  elements["schedule-enable-action"].hidden = Boolean(settings.enabled);
   elements["schedule-enabled"].checked = Boolean(settings.enabled);
   elements["schedule-frequency"].value = String(settings.intervalDays ?? 3);
   elements["schedule-time"].value = settings.localTime || "03:30";
@@ -303,6 +311,10 @@ async function loadScheduleStatus() {
     renderScheduleStatus(payload);
     return payload;
   } catch (error) {
+    const presentation = scheduleStatusPresentation("unknown");
+    elements["automatic-backup"].dataset.state = "unknown";
+    elements["schedule-status-badge"].textContent = presentation.label;
+    elements["schedule-status-badge"].dataset.tone = presentation.tone;
     elements["schedule-message"].textContent = error instanceof Error ? error.message : String(error);
     elements["schedule-message"].dataset.tone = "error";
     return null;
@@ -1104,6 +1116,13 @@ elements["clear-log"].addEventListener("click", () => { elements.log.textContent
 elements["schedule-save"].addEventListener("click", saveScheduleSettings);
 elements["schedule-run"].addEventListener("click", runScheduleNow);
 elements["schedule-refresh"].addEventListener("click", loadScheduleStatus);
+elements["schedule-enable-action"].addEventListener("click", () => {
+  elements["schedule-enabled"].checked = true;
+  elements["schedule-settings"].open = true;
+  elements["schedule-message"].textContent = "已选择开启自动备份。确认执行频率和时间后，点击“保存定时设置”生效。";
+  elements["schedule-message"].dataset.tone = "warning";
+  elements["schedule-time"].focus();
+});
 elements["schedule-test-start"].addEventListener("click", startTenMinuteScheduleTest);
 elements["schedule-test-cancel"].addEventListener("click", cancelTenMinuteScheduleTest);
 elements["preflight-close"].addEventListener("click", closePreflight);

@@ -13,10 +13,11 @@ import { reconcileDurableProgress, runSelectedConversationExport } from "./histo
 import { createLowMemoryHistoryArchivePlan, buildLowMemoryHistoryArchiveVolume } from "./history-archive.js";
 import { createSavedHistoryExportSnapshot } from "./history-export-snapshot.js";
 import { createTaskFeedback } from "./task-feedback.js";
+import { buildBasketCatalog, captureEligibility } from "./conversation-catalog-view.js";
 
 const byId = (id) => document.getElementById(id);
 const elements = Object.fromEntries([
-  "connection", "load", "select-visible", "clear-selection", "query", "collection", "scope",
+  "connection", "load", "select-visible", "clear-selection", "provider", "query", "collection", "scope",
   "catalog-summary", "visible-count", "conversation-list", "catalog-render-meta", "load-more-conversations",
   "selected-count", "selection-title", "selected-list", "asset-policy", "export-selected", "pause-capture",
   "export-saved", "save-selection", "new-batch", "phase", "progress-title", "percent", "bar", "status",
@@ -110,6 +111,8 @@ function restoreUiPreferences() {
     const value = JSON.parse(localStorage.getItem(UI_PREFS_KEY) || "null");
     if (!value) return;
     if (typeof value.query === "string") elements.query.value = value.query;
+    if (typeof value.provider === "string") elements.provider.value = value.provider;
+    if (typeof value.collection === "string") elements.collection.value = value.collection;
     if (["all", "active", "archived"].includes(value.scope)) elements.scope.value = value.scope;
     if (["references-only", "download"].includes(value.assetPolicy)) elements["asset-policy"].value = value.assetPolicy;
   } catch { /* keep safe defaults */ }
@@ -119,6 +122,7 @@ function persistUiPreferences() {
   try {
     localStorage.setItem(UI_PREFS_KEY, JSON.stringify({
       query: elements.query.value,
+      provider: elements.provider.value,
       scope: elements.scope.value,
       collection: elements.collection.value,
       assetPolicy: elements["asset-policy"].value,
@@ -145,8 +149,8 @@ function selectionForSave() {
   return createConversationSelectionSet({
     id: selection.id,
     title: elements["selection-title"].value,
-    provider: "chatgpt",
-    accountScopeId: catalog?.accountScopeId ?? selection.accountScopeId ?? null,
+    provider: null,
+    accountScopeId: null,
     refs: selection.items,
     createdAt: selection.createdAt,
   });
@@ -248,11 +252,23 @@ function populateCatalogView(nextCatalog, { cachedAt = null } = {}) {
     try { return JSON.parse(localStorage.getItem(UI_PREFS_KEY) || "null")?.collection || ""; }
     catch { return ""; }
   })();
-  elements.collection.innerHTML = '<option value="">全部项目与空间</option>';
-  for (const item of catalog.collections || []) {
+  const preferredProvider = (() => {
+    try { return JSON.parse(localStorage.getItem(UI_PREFS_KEY) || "null")?.provider || ""; }
+    catch { return ""; }
+  })();
+  elements.provider.innerHTML = '<option value="">全部平台</option>';
+  for (const item of nextCatalog.providers || []) {
     const option = document.createElement("option");
-    option.value = item.collectionId;
-    option.textContent = item.title || "未命名项目";
+    option.value = item.id;
+    option.textContent = `${item.label} (${item.count})`;
+    elements.provider.append(option);
+  }
+  if ([...elements.provider.options].some((option) => option.value === preferredProvider)) elements.provider.value = preferredProvider;
+  elements.collection.innerHTML = '<option value="">全部项目与空间</option>';
+  for (const item of nextCatalog.collections || []) {
+    const option = document.createElement("option");
+    option.value = item.key;
+    option.textContent = `${item.providerLabel} · ${item.title || "未命名项目"}`;
     elements.collection.append(option);
   }
   if ([...elements.collection.options].some((option) => option.value === preferredCollection)) elements.collection.value = preferredCollection;
@@ -270,7 +286,7 @@ function applyFilters() {
     renderAvailable();
     return;
   }
-  let refs = filterConversationRefs(catalog.conversations, elements.query.value, { collectionId: elements.collection.value });
+  let refs = filterConversationRefs(catalog.conversations, elements.query.value, { provider: elements.provider.value, collectionKey: elements.collection.value });
   if (elements.scope.value === "active") refs = refs.filter((ref) => !ref.isArchived);
   else if (elements.scope.value === "archived") refs = refs.filter((ref) => ref.isArchived);
   visibleRefs = refs;
@@ -316,11 +332,15 @@ function renderAvailable() {
     title.textContent = ref.title;
     const meta = document.createElement("span");
     const collection = ref.collectionRefs?.[0]?.title;
-    meta.textContent = `${formatTime(ref.updatedAt)}${collection ? ` · ${collection}` : ""}`;
+    meta.textContent = `${formatTime(ref.updatedAt)} · ${ref.providerLabel || ref.provider}${collection ? ` · ${collection}` : ""} · ${ref.isArchived ? "Archived" : ref.primaryCollectionId ? "Project" : "Chat"}`;
+    const provider = document.createElement("span");
+    provider.className = "conversation-provider";
+    provider.textContent = ref.providerLabel || ref.provider;
     copy.append(title, meta);
     const badge = document.createElement("span");
     badge.className = "conversation-badge";
-    badge.textContent = ref.isArchived ? "Archived" : ref.primaryCollectionId ? "Project" : "Chat";
+    badge.textContent = ref.providerLabel || ref.provider;
+    copy.prepend(provider);
     label.append(checkbox, copy, badge);
     fragment.append(label);
   }
@@ -371,17 +391,19 @@ function renderSelection() {
 
 async function restoreBasketState() {
   restoreUiPreferences();
-  const [savedSelections, cachedCatalog] = await Promise.all([
+  const [savedSelections, cachedCatalogs] = await Promise.all([
     selectionStore.list().catch(() => []),
-    catalogStore.getLatest("chatgpt").catch(() => null),
+    // Replaces catalogStore.getLatest("chatgpt") so every real cached provider remains visible.
+    catalogStore.list().catch(() => []),
   ]);
   if (savedSelections[0]) {
     selection = createConversationSelectionSet(savedSelections[0]);
     elements["selection-title"].value = selection.title;
   }
   await loadCurrentJob();
-  if (cachedCatalog?.catalog) {
-    populateCatalogView(cachedCatalog.catalog, { cachedAt: cachedCatalog.cachedAt });
+  const cachedCatalog = buildBasketCatalog(cachedCatalogs);
+  if (cachedCatalog.conversations.length) {
+    populateCatalogView(cachedCatalog, { cachedAt: cachedCatalogs[0]?.cachedAt ?? null });
     setStatus(`已恢复上次会话目录和 ${selection.items.length} 条选择。需要最新目录时再点“刷新会话目录”。`, "success");
   } else if (selection.items.length) {
     setStatus(`已恢复 ${selection.items.length} 条上次选择；刷新目录后可以继续增删。`, "success");
@@ -425,7 +447,8 @@ async function loadCatalog() {
       log(`目录缓存失败：${error instanceof Error ? error.message : String(error)}`);
       return { cachedAt: new Date().toISOString() };
     });
-    populateCatalogView(freshCatalog, { cachedAt: cached.cachedAt });
+    const aggregate = buildBasketCatalog(await catalogStore.list());
+    populateCatalogView(aggregate, { cachedAt: cached.cachedAt });
     if (!selectionLocked()) {
       selection = selectionForSave();
       await selectionStore.put(selection);
@@ -485,7 +508,12 @@ function progressFromEvent(event) {
 }
 
 async function runCapture() {
-  if (activeCapture || activeArchive || catalogBusy || !selection.items.length) return;
+  if (activeCapture || activeArchive || catalogBusy) return;
+  const eligibility = captureEligibility(selection.items);
+  if (!eligibility.eligible) {
+    setStatus(eligibility.reason, "warning");
+    return;
+  }
   await saveSelectionNow();
   await loadCurrentJob();
   if (currentJob && !selectionMatchesJob(currentJob)) {
@@ -681,6 +709,7 @@ async function startNewBatch() {
 
 elements.load.addEventListener("click", loadCatalog);
 elements.query.addEventListener("input", applyFilters);
+elements.provider.addEventListener("change", applyFilters);
 elements.collection.addEventListener("change", applyFilters);
 elements.scope.addEventListener("change", applyFilters);
 elements["asset-policy"].addEventListener("change", persistUiPreferences);
@@ -693,14 +722,14 @@ elements["select-visible"].addEventListener("click", () => {
   if (selectionLocked()) return;
   const byKey = new Map(selection.items.map((item) => [item.key, item]));
   for (const ref of visibleRefs) byKey.set(ref.key, ref);
-  selection = createConversationSelectionSet({ id: selection.id, title: elements["selection-title"].value, provider: "chatgpt", accountScopeId: catalog?.accountScopeId ?? null, refs: [...byKey.values()], createdAt: selection.createdAt });
+  selection = createConversationSelectionSet({ id: selection.id, title: elements["selection-title"].value, provider: null, accountScopeId: null, refs: [...byKey.values()], createdAt: selection.createdAt });
   scheduleSelectionSave();
   renderSelection();
   renderAvailable();
 });
 elements["clear-selection"].addEventListener("click", () => {
   if (selectionLocked()) return;
-  selection = createConversationSelectionSet({ id: selection.id, title: elements["selection-title"].value, provider: "chatgpt", accountScopeId: catalog?.accountScopeId ?? null, refs: [], createdAt: selection.createdAt });
+  selection = createConversationSelectionSet({ id: selection.id, title: elements["selection-title"].value, provider: null, accountScopeId: null, refs: [], createdAt: selection.createdAt });
   scheduleSelectionSave();
   renderSelection();
   renderAvailable();

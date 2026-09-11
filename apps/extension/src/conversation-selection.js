@@ -38,6 +38,7 @@ export function normalizeConversationRef(ref) {
     primaryCollectionId: cleanText(ref.primaryCollectionId ?? ref.projectId) || null,
     collectionRefs: Array.isArray(ref.collectionRefs) ? ref.collectionRefs.map((item) => ({ ...item })) : [],
     sourceMetadata: ref.sourceMetadata ?? ref,
+    providerLabel: cleanText(ref.providerLabel) || null,
   };
 }
 
@@ -88,9 +89,11 @@ export function filterConversationRefs(refs, query, options = {}) {
   const needle = cleanText(query).toLocaleLowerCase();
   const provider = cleanText(options.provider);
   const collectionId = cleanText(options.collectionId);
+  const collectionKey = cleanText(options.collectionKey);
   return (refs ?? []).map(normalizeConversationRef).filter((ref) => {
     if (provider && ref.provider !== provider) return false;
     if (collectionId && ref.primaryCollectionId !== collectionId && !ref.collectionRefs.some((item) => item.collectionId === collectionId)) return false;
+    if (collectionKey && `${ref.provider}:${ref.primaryCollectionId || ""}` !== collectionKey && !ref.collectionRefs.some((item) => `${ref.provider}:${item.collectionId}` === collectionKey)) return false;
     if (!needle) return true;
     const haystack = [ref.title, ref.provider, ref.primaryCollectionId, ...ref.collectionRefs.map((item) => item.title || item.collectionId)].join(" ").toLocaleLowerCase();
     return haystack.includes(needle);

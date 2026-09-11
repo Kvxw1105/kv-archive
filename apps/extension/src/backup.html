@@ -55,64 +55,72 @@
           <button id="health-action" class="secondary">查看下一步</button>
         </section>
 
+        <section id="automatic-backup" class="card schedule-card schedule-primary" data-state="unknown">
+          <div class="schedule-primary-head">
+            <div class="section-index">
+              <span>01A</span>
+              <div>
+                <span class="phase">AUTOMATIC BACKUP</span>
+                <h2>定时增量备份</h2>
+                <p>自动扫描新增与变更内容，建立可恢复的逻辑快照；Chrome 错过计划时间后会在下次启动补跑。</p>
+              </div>
+            </div>
+            <div class="schedule-primary-controls">
+              <span id="schedule-status-badge" class="schedule-status-badge" data-tone="neutral">状态未知</span>
+              <label class="switch-row"><input id="schedule-enabled" type="checkbox"><span>自动备份</span></label>
+            </div>
+          </div>
+          <div class="schedule-summary schedule-summary-primary">
+            <div><span>当前状态</span><strong id="schedule-state">未启用</strong></div>
+            <div><span>下次运行</span><strong id="schedule-next">未启用</strong></div>
+            <div><span>上次成功</span><strong id="schedule-last">尚无</strong></div>
+          </div>
+          <div class="schedule-summary schedule-summary-evidence">
+            <div><span>逻辑快照</span><strong id="schedule-snapshots">0</strong></div>
+            <div><span>最近变化</span><strong id="schedule-delta">+0 · ~0 · −0</strong></div>
+            <div><span>本轮复用节省</span><strong id="schedule-dedup">0 B</strong></div>
+          </div>
+          <p id="schedule-message" class="status inline-note">正在读取自动备份状态…</p>
+          <div class="actions schedule-primary-actions">
+            <button id="schedule-run" class="primary">立即增量备份</button>
+            <button id="schedule-enable-action" class="primary" hidden>设置并开启自动备份</button>
+            <button id="schedule-refresh" class="secondary">刷新状态</button>
+          </div>
+          <details id="schedule-settings" class="schedule-disclosure">
+            <summary><span><strong>调整自动备份设置</strong><small id="schedule-settings-summary">每 3 天 · 03:30 · 仅空闲时</small></span><span>展开设置</span></summary>
+            <div class="schedule-settings-body">
+              <div class="schedule-grid">
+                <label><span>执行频率</span><select id="schedule-frequency"><option value="1">每天</option><option value="3">每 3 天</option><option value="7">每周</option><option value="30">每 30 天</option></select></label>
+                <label><span>本地时间</span><input id="schedule-time" type="time" value="03:30"></label>
+                <label><span>附件策略</span><select id="schedule-assets"><option value="references-only">仅保存附件引用（推荐）</option><option value="download">同时下载新增附件</option></select></label>
+                <label><span>最多保留快照</span><input id="schedule-retention-count" type="number" min="1" max="365" value="30"></label>
+                <label><span>最长保留天数</span><input id="schedule-retention-days" type="number" min="1" max="3650" value="180"></label>
+                <label class="check-row"><input id="schedule-idle" type="checkbox" checked><span>仅在浏览器空闲时启动</span></label>
+              </div>
+              <div class="actions"><button id="schedule-save" class="primary">保存定时设置</button></div>
+            </div>
+          </details>
+          <details class="schedule-tools">
+            <summary><span><strong>验收工具</strong><small>验证 Chrome Alarm 与自动增量链路</small></span><span>按需展开</span></summary>
+            <div class="schedule-tools-body">
+              <section class="schedule-test-panel" aria-labelledby="schedule-test-title">
+                <div class="schedule-test-copy"><span class="phase">TEN-MINUTE ACCEPTANCE</span><h3 id="schedule-test-title">10 分钟自动增量验收</h3><p>先保留一份基线快照，然后在 10 分钟内新建或编辑一条 ChatGPT 会话。到时扩展会由 Chrome Alarm 自动唤醒并运行增量检查。</p></div>
+                <div class="schedule-summary schedule-test-summary"><div><span>验收状态</span><strong id="schedule-test-state">未启动</strong></div><div><span>自动触发时间</span><strong id="schedule-test-due">尚无</strong></div><div><span>剩余时间</span><strong id="schedule-test-countdown">尚无</strong></div><div><span>检测结果</span><strong id="schedule-test-result">尚无</strong></div></div>
+                <div id="schedule-test-progress" class="schedule-test-progress" hidden><div class="schedule-test-progress__track"><span id="schedule-test-progress-bar"></span></div><small id="schedule-test-progress-label">等待开始</small></div>
+                <p id="schedule-test-message" class="status inline-note">需要至少一份逻辑快照作为比较基线。测试期间可以关闭 KV Archive 页面，但应保持 Chrome 运行并保留一个已登录 ChatGPT 标签页。</p>
+                <div class="actions"><button id="schedule-test-start" class="secondary">开始 10 分钟验收</button><button id="schedule-test-cancel" class="ghost" disabled>取消待运行验收</button></div>
+              </section>
+            </div>
+          </details>
+        </section>
+
         <section class="card workspace-card">
-          <div class="section-index"><span>01A</span><div><span class="phase">BACKUP SPACE</span><h2>选择平台账号空间</h2></div></div>
+          <div class="section-index"><span>01B</span><div><span class="phase">BACKUP SPACE</span><h2>选择平台账号空间</h2></div></div>
           <div class="workspace-control">
             <select id="workspace" aria-label="平台账号空间"><option value="">个人空间</option></select>
             <p id="workspace-help">会自动读取当前登录账号可用的空间；授权只存在于本次运行内存中。</p>
           </div>
         </section>
-
-        <details class="card schedule-card advanced-surface">
-          <summary class="advanced-summary"><span><span class="phase">AUTOMATION</span><strong>定时增量备份</strong></span><span>按需展开</span></summary>
-          <div class="schedule-body">
-          <div class="schedule-head">
-            <p>只扫描新增或变更内容，不自动生成完整 ZIP。成功后建立逻辑快照，重复内容不会再次占用一份存储。</p>
-            <label class="switch-row"><input id="schedule-enabled" type="checkbox"><span>启用</span></label>
-          </div>
-          <div class="schedule-grid">
-            <label><span>执行频率</span><select id="schedule-frequency"><option value="1">每天</option><option value="3">每 3 天</option><option value="7">每周</option><option value="30">每 30 天</option></select></label>
-            <label><span>本地时间</span><input id="schedule-time" type="time" value="03:30"></label>
-            <label><span>附件策略</span><select id="schedule-assets"><option value="references-only">仅保存附件引用（推荐）</option><option value="download">同时下载新增附件</option></select></label>
-            <label><span>最多保留快照</span><input id="schedule-retention-count" type="number" min="1" max="365" value="30"></label>
-            <label><span>最长保留天数</span><input id="schedule-retention-days" type="number" min="1" max="3650" value="180"></label>
-            <label class="check-row"><input id="schedule-idle" type="checkbox" checked><span>仅在浏览器空闲时启动</span></label>
-          </div>
-          <div class="schedule-summary">
-            <div><span>下次运行</span><strong id="schedule-next">未启用</strong></div>
-            <div><span>上次成功</span><strong id="schedule-last">尚无</strong></div>
-            <div><span>逻辑快照</span><strong id="schedule-snapshots">0</strong></div>
-            <div><span>最近变化</span><strong id="schedule-delta">+0 · ~0 · −0</strong></div>
-            <div><span>本轮复用节省</span><strong id="schedule-dedup">0 B</strong></div>
-            <div><span>当前状态</span><strong id="schedule-state">未启用</strong></div>
-          </div>
-          <p id="schedule-message" class="status inline-note">浏览器关闭时会错过准确时刻，但下次启动后会自动补跑。必须保留一个已登录的 ChatGPT 标签页。</p>
-          <div class="actions">
-            <button id="schedule-save" class="primary">保存定时设置</button>
-            <button id="schedule-run" class="secondary">立即增量运行一次</button>
-            <button id="schedule-refresh" class="ghost">刷新状态</button>
-          </div>
-          <section class="schedule-test-panel" aria-labelledby="schedule-test-title">
-            <div class="schedule-test-copy">
-              <span class="phase">TEN-MINUTE ACCEPTANCE</span>
-              <h3 id="schedule-test-title">10 分钟自动增量验收</h3>
-              <p>先保留一份基线快照，然后在 10 分钟内新建或编辑一条 ChatGPT 会话。到时扩展会由 Chrome Alarm 自动唤醒并运行增量检查。</p>
-            </div>
-            <div class="schedule-summary schedule-test-summary">
-              <div><span>验收状态</span><strong id="schedule-test-state">未启动</strong></div>
-              <div><span>自动触发时间</span><strong id="schedule-test-due">尚无</strong></div>
-              <div><span>剩余时间</span><strong id="schedule-test-countdown">尚无</strong></div>
-              <div><span>检测结果</span><strong id="schedule-test-result">尚无</strong></div>
-            </div>
-            <div id="schedule-test-progress" class="schedule-test-progress" hidden><div class="schedule-test-progress__track"><span id="schedule-test-progress-bar"></span></div><small id="schedule-test-progress-label">等待开始</small></div>
-            <p id="schedule-test-message" class="status inline-note">需要至少一份逻辑快照作为比较基线。测试期间可以关闭 KV Archive 页面，但应保持 Chrome 运行并保留一个已登录 ChatGPT 标签页。</p>
-            <div class="actions">
-              <button id="schedule-test-start" class="secondary">开始 10 分钟验收</button>
-              <button id="schedule-test-cancel" class="ghost" disabled>取消待运行验收</button>
-            </div>
-          </section>
-          </div>
-        </details>
 
         <details class="card detailed-metrics">
           <summary><span><span class="phase">DETAILED COUNTS</span><strong>详细统计</strong></span><span id="metrics-summary">尚无备份数据</span></summary>

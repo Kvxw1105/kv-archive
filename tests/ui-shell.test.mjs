@@ -57,7 +57,9 @@ test("backup center defaults manual runs to conversation-first attachment refere
 test("advanced controls use progressive disclosure without removing core actions", async () => {
   const backup = await readFile("apps/extension/src/backup.html", "utf8");
   const knowledge = await readFile("apps/extension/src/knowledge.html", "utf8");
-  assert.match(backup, /class="[^"]*\badvanced-surface\b[^"]*"/);
+  assert.match(backup, /id="automatic-backup" class="card schedule-card schedule-primary"/);
+  assert.match(backup, /<details id="schedule-settings"/);
+  assert.match(backup, /<details class="schedule-tools"/);
   assert.match(backup, /class="action-more"/);
   assert.match(backup, /id="backup-health"/);
   assert.match(backup, /id="preflight-panel"/);
@@ -86,4 +88,11 @@ test("Capture Center exposes portable dry-run recovery without weakening local-o
   assert.match(source, /readPortableCaptureZip/);
   assert.match(source, /analyzePortablePackage/);
   assert.match(source, /rollbackPortableImport/);
+});
+
+test("Conversation Basket exposes a real provider filter", async () => {
+  const basket = await readFile("apps/extension/src/basket.html", "utf8");
+  assert.match(basket, /id="provider"/);
+  assert.match(basket, /全部平台/);
+  assert.match(basket, /按平台分别采集/);
 });

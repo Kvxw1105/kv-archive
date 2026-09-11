@@ -139,3 +139,14 @@ test("Notes PWA separates accent text from white-on-color button surfaces", asyn
   }
   assert.match(css, /\.quick-add[\s\S]*background:\s*var\(--wine-control\)/);
 });
+
+test("scheduled backup primary card exposes semantic state and responsive hierarchy", async () => {
+  const css = await readFile("apps/extension/src/backup.css", "utf8");
+  assert.match(css, /\.schedule-primary-head/);
+  assert.match(css, /\.schedule-status-badge\[data-tone="good"\]/);
+  assert.match(css, /\.schedule-status-badge\[data-tone="warning"\]/);
+  assert.match(css, /\.schedule-status-badge\[data-tone="danger"\]/);
+  assert.match(css, /\.schedule-summary-primary/);
+  assert.match(css, /\.schedule-disclosure/);
+  assert.match(css, /@media \(max-width: 620px\)/);
+});
