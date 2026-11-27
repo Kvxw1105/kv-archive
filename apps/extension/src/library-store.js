@@ -85,6 +85,29 @@ function isIncomingStale(existing, incoming) {
   return Number.isFinite(current) && Number.isFinite(next) && next < current;
 }
 
+// An official export does not have authority to reclassify an existing library Project.
+function preserveOfficialProject(existing, bundle) {
+  if (bundle.evidence.sourceKind !== "openai-official" || !existing?.projectId) return { bundle, projectPreserved: false };
+  const projectId = existing.projectId;
+  const projectTitle = existing.projectTitle || (bundle.conversation.projectId === projectId ? bundle.conversation.projectTitle : null);
+  const projectPreserved = projectId !== bundle.conversation.projectId || projectTitle !== bundle.conversation.projectTitle;
+  if (!projectPreserved) return { bundle, projectPreserved };
+  const project = { projectId, projectTitle };
+  return {
+    projectPreserved,
+    bundle: { ...bundle, conversation: { ...bundle.conversation, ...project }, messages: bundle.messages.map((row) => ({ ...row, ...project })) },
+  };
+}
+
+function mergeImportConversation(existing, incoming, status) {
+  return {
+    ...(existing || {}),
+    ...(status === "stale" ? {} : incoming),
+    sourceKinds: mergeUnique(existing?.sourceKinds, incoming.sourceKinds),
+    sourceFiles: mergeUnique(existing?.sourceFiles, incoming.sourceFiles),
+  };
+}
+
 function applyFilters(message, conversation, filters) {
   if (filters.role && filters.role !== "all" && message.role !== filters.role) return false;
   if (filters.sourceKind && filters.sourceKind !== "all" && !conversation.sourceKinds?.includes(filters.sourceKind)) return false;
@@ -176,44 +199,50 @@ function sortProposals(rows) {
 
 export function createIndexedDbLibraryStore() {
   return {
-    async upsertBundle(bundle) {
+    async upsertBundle(incomingBundle) {
       const db = await openDatabase();
       try {
-        const readTx = db.transaction(CONVERSATIONS, "readonly");
-        const existing = await requestResult(readTx.objectStore(CONVERSATIONS).get(bundle.conversation.key));
-        const status = !existing ? "inserted" : existing.currentEvidenceHash === bundle.conversation.currentEvidenceHash ? "duplicate" : isIncomingStale(existing, bundle.conversation) ? "stale" : "updated";
-        const mergedConversation = status === "stale" ? {
-          ...existing,
-          sourceKinds: mergeUnique(existing?.sourceKinds, bundle.conversation.sourceKinds),
-          sourceFiles: mergeUnique(existing?.sourceFiles, bundle.conversation.sourceFiles),
-        } : {
-          ...(existing || {}),
-          ...bundle.conversation,
-          sourceKinds: mergeUnique(existing?.sourceKinds, bundle.conversation.sourceKinds),
-          sourceFiles: mergeUnique(existing?.sourceFiles, bundle.conversation.sourceFiles),
-        };
-        if (status === "duplicate" || status === "stale") {
-          const tx = db.transaction([CONVERSATIONS, EVIDENCE], "readwrite");
-          tx.objectStore(CONVERSATIONS).put(mergedConversation);
-          tx.objectStore(EVIDENCE).put(bundle.evidence);
-          await transactionDone(tx);
-          return { status };
-        }
-        const oldMessageKeys = existing ? await keysForIndex(db, MESSAGES, "conversationKey", bundle.conversation.key) : [];
-        const oldPostingKeys = existing ? await keysForIndex(db, POSTINGS, "conversationKey", bundle.conversation.key) : [];
         const tx = db.transaction([CONVERSATIONS, EVIDENCE, MESSAGES, POSTINGS], "readwrite");
+        const done = transactionDone(tx);
+        // Prevent an unhandled rejection if an awaited IDB request also fails.
+        done.catch(() => {});
         const conversations = tx.objectStore(CONVERSATIONS);
         const evidence = tx.objectStore(EVIDENCE);
         const messages = tx.objectStore(MESSAGES);
         const postings = tx.objectStore(POSTINGS);
-        conversations.put(mergedConversation);
-        evidence.put(bundle.evidence);
-        for (const key of oldMessageKeys) messages.delete(key);
-        for (const key of oldPostingKeys) postings.delete(key);
-        for (const row of bundle.messages) messages.put(row);
-        for (const row of bundle.postings) postings.put(row);
-        await transactionDone(tx);
-        return { status };
+        try {
+          const existing = await requestResult(conversations.get(incomingBundle.conversation.key));
+          const { bundle, projectPreserved } = preserveOfficialProject(existing, incomingBundle);
+          const status = !existing ? "inserted" : existing.currentEvidenceHash === bundle.conversation.currentEvidenceHash ? "duplicate" : isIncomingStale(existing, bundle.conversation) ? "stale" : "updated";
+          const indexChanged = status === "inserted" || status === "updated";
+          const [evidenceKey, oldMessageKeys, oldPostingKeys] = await Promise.all([
+            requestResult(evidence.getKey(bundle.evidence.key)),
+            indexChanged && existing ? requestResult(messages.index("conversationKey").getAllKeys(IDBKeyRange.only(bundle.conversation.key))) : [],
+            indexChanged && existing ? requestResult(postings.index("conversationKey").getAllKeys(IDBKeyRange.only(bundle.conversation.key))) : [],
+          ]);
+          conversations.put(mergeImportConversation(existing, bundle.conversation, status));
+          if (evidenceKey === undefined) evidence.add(bundle.evidence);
+          if (indexChanged) {
+            for (const key of oldMessageKeys) messages.delete(key);
+            for (const key of oldPostingKeys) postings.delete(key);
+            for (const row of bundle.messages) messages.put(row);
+            for (const row of bundle.postings) postings.put(row);
+          }
+          await done;
+          return { status, projectPreserved };
+        } catch (error) {
+          try { tx.abort(); } catch { /* already settled */ }
+          throw error;
+        }
+      } finally { db.close(); }
+    },
+
+    async getLatestImportReceipt() {
+      const db = await openDatabase();
+      try {
+        const tx = db.transaction(IMPORTS, "readonly");
+        const cursor = await requestResult(tx.objectStore(IMPORTS).openCursor(IDBKeyRange.bound("receipt:", "receipt:\uffff"), "prev"));
+        return cursor?.value?.report ?? null;
       } finally { db.close(); }
     },
 
@@ -766,21 +795,22 @@ export function createMemoryLibraryStore() {
   const state = { imports: [], conversations: new Map(), evidence: new Map(), messages: new Map(), postings: new Map(), projectStates: new Map(), stateVersions: new Map(), proposals: new Map(), events: [], memoryProfiles: new Map(), memoryVersions: new Map(), memoryEvents: [], memoryGateConfigs: new Map(), memoryGateRuns: new Map(), knowledgeExportProfiles: new Map(), knowledgeExportPaths: new Map(), knowledgeExportRuns: new Map(), captureItems: new Map() };
   return {
     state,
-    async upsertBundle(bundle) {
-      const existing = state.conversations.get(bundle.conversation.key);
+    async upsertBundle(incomingBundle) {
+      const existing = state.conversations.get(incomingBundle.conversation.key);
+      const { bundle, projectPreserved } = preserveOfficialProject(existing, incomingBundle);
       const status = !existing ? "inserted" : existing.currentEvidenceHash === bundle.conversation.currentEvidenceHash ? "duplicate" : isIncomingStale(existing, bundle.conversation) ? "stale" : "updated";
-      state.evidence.set(bundle.evidence.key, structuredClone(bundle.evidence));
-      const merged = status === "stale" ? { ...existing, sourceKinds: mergeUnique(existing?.sourceKinds, bundle.conversation.sourceKinds), sourceFiles: mergeUnique(existing?.sourceFiles, bundle.conversation.sourceFiles) } : { ...(existing || {}), ...structuredClone(bundle.conversation), sourceKinds: mergeUnique(existing?.sourceKinds, bundle.conversation.sourceKinds), sourceFiles: mergeUnique(existing?.sourceFiles, bundle.conversation.sourceFiles) };
-      state.conversations.set(bundle.conversation.key, merged);
+      if (!state.evidence.has(bundle.evidence.key)) state.evidence.set(bundle.evidence.key, structuredClone(bundle.evidence));
+      state.conversations.set(bundle.conversation.key, structuredClone(mergeImportConversation(existing, bundle.conversation, status)));
       if (status !== "duplicate" && status !== "stale") {
         for (const [key, value] of state.messages) if (value.conversationKey === bundle.conversation.key) state.messages.delete(key);
         for (const [key, value] of state.postings) if (value.conversationKey === bundle.conversation.key) state.postings.delete(key);
         for (const row of bundle.messages) state.messages.set(row.key, structuredClone(row));
         for (const row of bundle.postings) state.postings.set(row.key, structuredClone(row));
       }
-      return { status };
+      return { status, projectPreserved };
     },
     async putImport(record) { state.imports.push(structuredClone(record)); },
+    async getLatestImportReceipt() { return structuredClone(state.imports.filter(({id}) => id.startsWith("receipt:")).sort((a, b) => b.id.localeCompare(a.id))[0]?.report ?? null); },
     async getStats() { const proposals=[...state.proposals.values()]; return { conversations: state.conversations.size, messages: state.messages.size, evidence: state.evidence.size, imports: state.imports.length, states: state.projectStates.size, versions: state.stateVersions.size, proposals: state.proposals.size, events: state.events.length, pendingProposals: proposals.filter((row)=>row.status==="pending").length, conflictedProposals: proposals.filter((row)=>row.status==="conflicted").length }; },
     async listProjects() { const map = new Map(); for (const row of state.conversations.values()) if (row.projectId) map.set(row.projectId, { id: row.projectId, title: row.projectTitle || row.projectId }); return [...map.values()]; },
     async listConversations(filters = {}) { return sortConversations([...state.conversations.values()].filter((conversation) => { const pseudo = { role: "unknown", createdAt: conversation.updatedAt }; return applyFilters(pseudo, conversation, filters); })).slice(0, filters.limit || 200); },

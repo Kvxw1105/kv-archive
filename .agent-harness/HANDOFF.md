@@ -4,6 +4,13 @@ Date: 2026-08-09
 Baseline: v0.16.11  
 Mode: BOOTSTRAPPED → real-browser acceptance (TASK-031)
 
+## 2026-11-27 — official ChatGPT import and Library redesign
+
+The TASK-033 candidate is on a separate scoped branch. Local verification is complete for the synthetic import path. Receipt preview/write/download/reopen is covered by emulated DOM and IndexedDB checks; both official browser backends stopped before the real rendering/interaction pass. The installed extension and existing library were not touched. No data migration or schema/permissions change.
+
+Next: (1) isolated real Chrome visual and keyboard pass using synthetic files; (2) real-export read-only preflight/performance on a copy; (3) extend the visual system beyond Library only after this surface passes. See [TASK-033](TASK-033.md) for counts and acceptance boundaries. Do not close TASK-031 or release on synthetic evidence.
+
+
 ## Goal
 
 Move KV Archive from ZIP/chat-session development into a durable public GitHub repository with local-Agent implementation, reproducible CI, machine-readable state and explicit acceptance gates.
