@@ -10,6 +10,13 @@ CI run: `31276928345` — https://github.com/Kvxw1105/kv-archive/actions/runs/31
 Release: `v0.16.11` pre-release — https://github.com/Kvxw1105/kv-archive/releases/tag/v0.16.11  
 Branch protection: ruleset `main-protection` active (pull_request + non_fast_forward + required `verify` check)
 
+## 2026-11-27 — TASK-033 official import candidate
+
+- Official ZIP/JSON now has a write-free preview, explicit commit and an exportable per-file receipt. Bad files/entries/records do not hide good entries, and official updates preserve established Project locations.
+- Library page redesigned around the import flow. Local checks: typecheck, build, 311/311 automated tests, seven performance commands, synthetic receipt round-trip through an emulated IndexedDB and DOM, plus a verified patch rollback/reapply. Installed extension and real browser visual acceptance remain unverified; no owner data was used.
+- No database/schema/permission migrations; TASK-031 remains open independently. See [TASK-033](TASK-033.md).
+
+
 ## TASK-031 closure pass (2026-09-10)
 
 - Branch/PR baseline remains `fix/stuck-project-conversation-indexing` at `1fd73576ae04a9b42e3236499a63857f37a63606`; PR #3 is OPEN/CLEAN with prior `verify` SUCCESS.

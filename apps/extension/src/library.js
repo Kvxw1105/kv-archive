@@ -1,5 +1,5 @@
 import { createIndexedDbLibraryStore } from "./library-store.js";
-import { importArchivesIntoVault } from "./vault-import.js";
+import { createLibraryImportUi } from "./library-import-ui.js";
 import { buildAgentBundle } from "./agent-bundle.js";
 import { createIndexedDbCaptureStore } from "./capture-store.js";
 import { createTaskFeedback } from "./task-feedback.js";
@@ -14,11 +14,11 @@ import {
 
 const store = createIndexedDbLibraryStore();
 const captureStore = createIndexedDbCaptureStore();
-const taskFeedback = createTaskFeedback({ page: "LOCAL LIBRARY", autoScroll: true });
+const taskFeedback = createTaskFeedback({ page: "LOCAL LIBRARY", autoScroll: false });
 const taskAnchor = document.querySelector(".library-intro");
 const $ = (id) => document.getElementById(id);
 const elements = Object.fromEntries([
-  "files", "clear", "agent-export", "agent-scope", "import-status", "metric-conversations", "metric-messages",
+  "clear", "agent-export", "agent-scope", "import-status", "metric-conversations", "metric-messages",
   "metric-evidence", "metric-imports", "query", "search", "source", "project", "role", "archived", "date-from",
   "date-to", "results-title", "results-summary", "results", "load-more", "detail", "detail-content",
 ].map((id) => [id, $(id)]));
@@ -73,7 +73,7 @@ async function refreshStats() {
   // Agent export and filtering, even before they have an imported conversation.
   const projects = await store.listStateProjects();
   const current = elements.project.value;
-  elements.project.innerHTML = '<option value="all">全部</option>' + projects.map((project) => `<option value="${escapeHtml(project.id)}">${escapeHtml(project.title)}</option>`).join("");
+  elements.project.innerHTML = '<option value="all">全部项目</option>' + projects.map((project) => `<option value="${escapeHtml(project.id)}">${escapeHtml(project.title)}</option>`).join("");
   if ([...elements.project.options].some((option) => option.value === current)) elements.project.value = current;
   updateAgentScope();
 }
@@ -92,19 +92,19 @@ function resultCard(item, query, isNew = false) {
   const meta = [
     conversation.projectTitle ? `Project · ${conversation.projectTitle}` : conversation.archived ? "归档" : "普通会话",
     dateText(conversation.updatedAt || conversation.createdAt),
-    ...(conversation.sourceKinds || []),
+    ...(conversation.sourceKinds || []).map((kind) => ({ "openai-official": "ChatGPT 官方导出", "context-vault": "KV Archive", "kv-archive-current-conversation": "网页采集" })[kind] || kind),
   ];
   return `<button class="result" data-key="${escapeHtml(conversation.key)}" data-new="${isNew}"><div class="result-header"><div><h3>${escapeHtml(conversation.title)}</h3><div class="meta">${meta.map(escapeHtml).join(" · ")}</div></div>${message ? `<span class="role">${escapeHtml(roleLabel[message.role] || message.role)}</span>` : ""}</div>${message ? `<p class="snippet">${escapeHtml(snippet(message.text, query))}</p>` : `<p class="snippet">${conversation.messageCount || 0} 条可搜索消息，${conversation.activeMessageCount || 0} 条位于当前分支。</p>`}</button>`;
 }
 
-async function runSearch({ keepPosition = false } = {}) {
+async function runSearch({ keepPosition = false, quiet = false } = {}) {
   const requestId = ++searchRequestId;
   const current = filters();
   elements.search.disabled = true;
   elements["load-more"].disabled = true;
   elements.results.setAttribute("aria-busy", "true");
   if (!keepPosition) elements.results.innerHTML = '<div class="empty">正在读取本地索引并整理结果……</div>';
-  taskFeedback.start({
+  if (!quiet) taskFeedback.start({
     id: "library-search",
     title: "正在搜索本地资料库",
     detail: current.query ? `正在查找“${current.query}”并整理匹配结果。` : "正在读取最近对话。",
@@ -121,16 +121,17 @@ async function runSearch({ keepPosition = false } = {}) {
     if (requestId !== searchRequestId) return;
     const rows = current.query ? data.results : data.conversations;
     const page = pageResultRows(rows, resultLimit);
-    taskFeedback.update({ stage: "整理匹配结果", step: 2, current: page.visible.length, total: Math.max(page.visible.length, 1), detail: `已整理 ${page.visible.length} 项结果。` });
+    if (!quiet) taskFeedback.update({ stage: "整理匹配结果", step: 2, current: page.visible.length, total: Math.max(page.visible.length, 1), detail: `已整理 ${page.visible.length} 项结果。` });
     elements["results-title"].textContent = current.query ? `搜索“${current.query}”` : "最近对话";
     elements["results-summary"].textContent = page.hasMore ? `已显示 ${page.visible.length} 项，还有更多结果可继续加载` : `共显示 ${page.visible.length} 项`;
     elements.results.innerHTML = page.visible.length
       ? page.visible.map((row, index) => resultCard(row, current.query, keepPosition && index >= resultLimit - DEFAULT_RESULT_BATCH)).join("")
-      : '<div class="empty"><strong>没有匹配结果</strong><span>可调整关键词、来源、Project、角色或日期。</span><div class="empty-actions"><button type="button" data-library-action="clear-filters">清除筛选</button><button type="button" class="secondary" data-library-action="import">导入备份</button></div></div>';
+      : elements["metric-conversations"].textContent === "0"
+        ? '<div class="empty"><strong>还没有导入对话</strong><span>从一份 ChatGPT 导出包开始。先预检，不会自动写入。</span><div class="empty-actions"><button type="button" class="secondary" data-library-action="import">选择导出文件</button></div></div>'
+        : '<div class="empty"><strong>没有匹配结果</strong><span>可调整关键词、来源、Project、角色或日期。</span><div class="empty-actions"><button type="button" data-library-action="clear-filters">清除筛选</button><button type="button" class="secondary" data-library-action="import">导入备份</button></div></div>';
     elements["load-more"].hidden = !page.hasMore;
     elements["load-more"].textContent = page.hasMore ? `再加载 ${page.nextCount} 项` : "没有更多结果";
-    taskFeedback.success({ title: "资料库搜索完成", detail: `已显示 ${page.visible.length} 项结果。`, button: keepPosition ? elements["load-more"] : elements.search });
-    if (!keepPosition) elements["results-title"].scrollIntoView({ behavior: "smooth", block: "start" });
+    if (!quiet) taskFeedback.success({ title: "资料库搜索完成", detail: `已显示 ${page.visible.length} 项结果。`, button: keepPosition ? elements["load-more"] : elements.search });
   } catch (error) {
     if (requestId !== searchRequestId) return;
     const message = error instanceof Error ? error.message : String(error);
@@ -161,7 +162,7 @@ async function openDetail(key) {
   currentDetail = null;
   detailLimit = DEFAULT_DETAIL_BATCH;
   elements["detail-content"].innerHTML = '<div class="detail-shell"><h2>正在读取对话</h2><div class="detail-meta">正在从本地资料库读取消息并整理分支……</div></div>';
-  elements.detail.showModal();
+  if (!elements.detail.open) elements.detail.showModal();
   taskFeedback.start({ id: "library-detail", title: "正在打开对话详情", detail: "读取会话、消息和历史分支。", stage: "读取本地会话", step: 0, stepLabels: ["读取", "整理", "渲染", "完成"], anchor: elements["detail-content"], indeterminate: true });
   try {
     const detail = await store.getConversationDetail(key);
@@ -177,40 +178,15 @@ async function openDetail(key) {
   }
 }
 
-async function importFiles(fileList) {
-  const files = [];
-  for (const file of fileList) files.push({ name: file.name, bytes: new Uint8Array(await file.arrayBuffer()) });
-  if (!files.length) return;
-  elements.files.disabled = true;
-  taskFeedback.start({ id: "library-import", title: "正在导入资料库", detail: `读取 ${files.length} 个备份文件，校验后建立独立搜索索引。`, stage: "读取文件", step: 0, stepLabels: ["读取", "索引", "核验", "可搜索"], current: 0, total: files.length, anchor: taskAnchor });
-  setStatus(`正在读取 ${files.length} 个文件……`);
-  try {
-    const report = await importArchivesIntoVault({
-      files,
-      store,
-      onProgress: (event) => {
-        if (event.phase === "indexing") {
-          setStatus(`正在索引 ${event.index}/${event.total}：${event.title}`);
-          taskFeedback.update({ title: "正在建立搜索索引", detail: event.title || "逐条索引会话与消息", stage: "索引内容", step: 1, current: event.index, total: event.total, anchor: taskAnchor });
-        }
-      },
-    });
-    const resultText = `新增 ${report.inserted}，更新 ${report.updated}，重复 ${report.duplicate}，失败 ${report.failed}`;
-    setStatus(`导入完成：新增 ${report.inserted}，更新 ${report.updated}，重复跳过 ${report.duplicate}，旧版本保留 ${report.stale}，失败 ${report.failed}。`, report.failed ? "error" : "success");
-    if (report.failed) taskFeedback.fail({ title: "资料库导入部分失败", detail: resultText });
-    else taskFeedback.success({ title: "资料库导入完成", detail: `${resultText}；现在可以搜索和打开会话。` });
+const importUi = createLibraryImportUi({
+  store,
+  onNotice: setStatus,
+  async onCommitted() {
     await refreshStats();
     resultLimit = DEFAULT_RESULT_BATCH;
-    await runSearch();
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    setStatus(message, "error");
-    taskFeedback.fail({ title: "资料库导入失败", detail: message });
-  } finally {
-    elements.files.disabled = false;
-    elements.files.value = "";
-  }
-}
+    await runSearch({ quiet: true });
+  },
+});
 
 async function clearLibrary() {
   if (!confirm("确认清空可搜索会话索引？这不会删除 Project State、项目上下文、记录中心、Memory Gate 回执、原 AI 平台内容或已下载文件。")) return;
@@ -261,7 +237,6 @@ async function exportAgentBundle() {
   }
 }
 
-elements.files.addEventListener("change", () => importFiles(elements.files.files));
 elements.search.addEventListener("click", () => { resultLimit = DEFAULT_RESULT_BATCH; runSearch(); });
 elements.query.addEventListener("keydown", (event) => { if (event.key === "Enter") { resultLimit = DEFAULT_RESULT_BATCH; runSearch(); } });
 elements.query.addEventListener("input", updateAgentScope);
@@ -273,7 +248,7 @@ elements.results.addEventListener("click", (event) => {
   const result = event.target.closest("button.result[data-key]");
   if (result) { openDetail(result.dataset.key); return; }
   const action = event.target.closest("[data-library-action]")?.dataset.libraryAction;
-  if (action === "import") elements.files.click();
+  if (action === "import") importUi.open();
   else if (action === "retry") runSearch();
   else if (action === "clear-filters") {
     elements.query.value = "";
@@ -297,5 +272,6 @@ elements.detail.addEventListener("close", () => { currentDetail = null; detailLi
 elements.clear.addEventListener("click", clearLibrary);
 elements["agent-export"].addEventListener("click", exportAgentBundle);
 
+await importUi.restoreLatest();
 await refreshStats();
-await runSearch();
+await runSearch({ quiet: true });

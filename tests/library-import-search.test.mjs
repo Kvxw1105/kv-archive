@@ -4,7 +4,7 @@ import { readFile } from "node:fs/promises";
 import { deflateRawSync } from "node:zlib";
 import { createStoredZip, crc32 } from "../apps/extension/dist/zip.js";
 import { readZipEntries } from "../apps/extension/dist/zip-reader.js";
-import { inspectImportArchives, importArchivesIntoVault } from "../apps/extension/dist/vault-import.js";
+import { inspectImportArchives, importArchivesIntoVault, previewImportArchives, commitImportPlan } from "../apps/extension/dist/vault-import.js";
 import { createMemoryLibraryStore } from "../apps/extension/dist/library-store.js";
 import { tokenizeText } from "../apps/extension/dist/vault-index.js";
 import { normalizeChatGPTConversation } from "../dist/packages/normalizer/src/index.js";
@@ -243,4 +243,129 @@ test("search and Agent records exclude internal tool and reasoning events while 
   assert.equal(agent.messages.length, 2);
   assert.doesNotMatch(agent.messages.map((message) => message.text).join("\n"), /private tool payload|private reasoning/);
   assert.match(JSON.stringify(agent.evidence[0].rawEvidence), /private tool payload/);
+});
+
+const jsonFile = (name, value) => ({ name, bytes: encoder.encode(JSON.stringify(value)) });
+const reportSum = (report) => report.inserted + report.updated + report.duplicate + report.stale + report.failed;
+
+test("read-only plan accounts for rejected records, bad files, and bad shards before an explicit commit", async () => {
+  const store = createMemoryLibraryStore();
+  const alt = structuredClone(fixture);
+  alt.id += "-alt";
+  const selection = [
+    { name: "broken.zip", bytes: encoder.encode("not a ZIP") },
+    { name: "conversations-003.json", bytes: encoder.encode("[broken") },
+    { name: "mixed.zip", bytes: createStoredZip([
+      { name: "conversations-001.json", data: JSON.stringify([fixture, { id: "missing-graph" }]) },
+      { name: "conversations-002.json", data: JSON.stringify([alt]) },
+      { name: "conversations-004.json", data: "{broken" },
+      { name: "index.html", data: "<html>not imported</html>" },
+      { name: "attachment.txt", data: "do not import attachment bytes" },
+    ]) },
+  ];
+  const before = await store.getStats();
+  const plan = await previewImportArchives(selection);
+  assert.deepEqual(await store.getStats(), before);
+  assert.equal(await store.getLatestImportReceipt(), null);
+  assert.deepEqual([plan.files, plan.records, plan.ready, plan.rejected, plan.blockedUnits, plan.ignoredEntries], [3, 3, 2, 1, 3, 2]);
+  assert.equal(plan.inputFiles[2].issues.find((issue) => issue.unit === "record").recordNumber, 2);
+  assert.deepEqual(plan.inputFiles.map((row) => row.ready), [0, 0, 2]);
+  const receipt = await commitImportPlan({ plan, store });
+  assert.equal(receipt.status, "partial");
+  assert.equal(receipt.total, reportSum(receipt) + receipt.rejected);
+  assert.equal(receipt.inserted, 2);
+  assert.equal(receipt.inputFiles[2].inserted, 2);
+  assert.equal(receipt.inputFiles[2].fingerprint, plan.inputFiles[2].fingerprint);
+  assert.deepEqual(await store.getLatestImportReceipt(), receipt);
+  assert.equal((await store.search({ query: "non-active regenerated" })).results.length, 2);
+  const evidence = (await store.getConversationDetail("chatgpt:" + fixture.id)).evidence;
+  assert.equal(evidence.canonical.source.captureMode, "official-import");
+  assert.equal(evidence.canonical.source.completeness, "unknown");
+  await assert.rejects(() => commitImportPlan({ plan, store }), /本批已执行/);
+  assert.equal((await store.getStats()).imports, 1);
+});
+
+test("a ZIP entry with a failed CRC is dropped without blocking a verified sibling", async () => {
+  const digestMarker = "corrupt-this-payload";
+  const bytes = createStoredZip([
+    { name: "conversations-001.json", data: JSON.stringify([fixture]) },
+    { name: "conversations-002.json", data: digestMarker },
+    { name: "unrelated-asset.bin", data: "A".repeat(4096) },
+  ]);
+  bytes[Buffer.from(bytes).indexOf(Buffer.from(digestMarker))] ^= 1;
+  const store = createMemoryLibraryStore();
+  const plan = await previewImportArchives([{ name: "mixed.zip", bytes }], { maxUncompressedBytes: 2500 });
+  assert.deepEqual([plan.ready, plan.blockedUnits, plan.ignoredEntries], [1, 1, 1]);
+  assert.match(plan.inputFiles[0].issues[0].reason, /CRC/);
+  assert.equal((await commitImportPlan({ plan, store })).inserted, 1);
+});
+
+test("a File read error is accounted for independently of a good browser File", async () => {
+  const store = createMemoryLibraryStore();
+  const plan = await previewImportArchives([
+    { name: "conversations-001.json", async arrayBuffer() { throw new Error("unreadable"); } },
+    new File([JSON.stringify([fixture])], "conversations-002.json"),
+  ]);
+  assert.equal(plan.blockedUnits, 1);
+  assert.equal(plan.ready, 1);
+  assert.equal(plan.inputFiles[0].fingerprint, null);
+  assert.match(plan.inputFiles[0].issues[0].reason, /unreadable/);
+  assert.equal((await commitImportPlan({ plan, store })).inserted, 1);
+});
+
+test("official reimport preserves established Project ID and title on both results and indexed messages", async () => {
+  const store = createMemoryLibraryStore();
+  const projectId = "project-correct";
+  const projectTitle = "现有项目归类";
+  await importArchivesIntoVault({ files: [{ name: "backup.zip", bytes: createStoredZip([
+    { name: "conv/canonical.json", data: JSON.stringify(normalizeChatGPTConversation(fixture, { adapter: "fixture" })) },
+    { name: "conv/raw.json", data: JSON.stringify(fixture) },
+    { name: "conv/source-metadata.json", data: JSON.stringify({ locations: [{ type: "project", projectId, projectTitle }] }) },
+  ]) }], store });
+  const raw = structuredClone(fixture);
+  raw.project_id = "different-official-project";
+  raw.project_title = "Different Project";
+  raw.mapping["assistant-active"].message.content.parts[0] = "New searchable import answer";
+  raw.update_time += 60;
+  const files = [jsonFile("conversations.json", [raw])];
+  const update = await importArchivesIntoVault({ files, store });
+  const repeat = await importArchivesIntoVault({ files, store });
+  assert.deepEqual([update.updated, repeat.duplicate, update.preservedProject], [1, 1, 1]);
+  const hit = (await store.search({ query: "New searchable import answer", projectId })).results[0];
+  assert.equal(hit.conversation.projectTitle, projectTitle);
+  assert.equal(hit.message.projectId, projectId);
+  assert.equal(hit.message.projectTitle, projectTitle);
+  assert.equal((await store.search({ query: "New searchable import answer", projectId: raw.project_id })).results.length, 0);
+  const detail = await store.getConversationDetail("chatgpt:" + fixture.id);
+  assert.equal(detail.evidence.rawEvidence.project_id, raw.project_id);
+  assert.equal((await store.getStats()).evidence, 2);
+});
+
+test("a write error has a shard/record location and an unstored receipt remains truthful", async () => {
+  const alt = structuredClone(fixture);
+  alt.id += "-alt";
+  const plan = await previewImportArchives([jsonFile("conversations.json", [fixture, alt])]);
+  const backing = createMemoryLibraryStore();
+  const store = {
+    async upsertBundle(bundle) {
+      if (bundle.conversation.conversationId === fixture.id) throw new Error("write denied");
+      return backing.upsertBundle(bundle);
+    },
+    async putImport() { throw new Error("receipt store unavailable"); },
+  };
+  const receipt = await commitImportPlan({ plan, store });
+  assert.equal(receipt.status, "partial");
+  assert.equal(receipt.receiptStored, false);
+  assert.match(receipt.receiptError, /receipt store unavailable/);
+  assert.deepEqual(receipt.inputFiles[0].issues[0], { unit: "write", entryPath: "conversations.json", recordNumber: 1, reason: "write denied" });
+  assert.equal(receipt.total, reportSum(receipt) + receipt.rejected);
+  assert.equal((await backing.getStats()).conversations, 1);
+});
+
+test("a failed-only dry run exposes the reason without writing even a receipt", async () => {
+  const store = createMemoryLibraryStore();
+  const plan = await previewImportArchives([jsonFile("conversations.json", { incompatible: true })]);
+  assert.deepEqual([plan.ready, plan.blockedUnits], [0, 1]);
+  await assert.rejects(() => commitImportPlan({ plan, store }), /无可导入/);
+  assert.equal((await store.getStats()).imports, 0);
 });
