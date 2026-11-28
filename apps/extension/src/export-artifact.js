@@ -6,6 +6,7 @@ const GENERIC_TITLES = [
   /^(?:chatgpt|openai|claude|gemini|deepseek|kimi|豆包)$/i,
   /^(?:untitled conversation|new chat|chatgpt conversation|ai conversation)$/i,
   /^(?:未命名对话|新对话|网页\s*ai\s*对话|ai\s*对话|当前\s*ai\s*对话)$/i,
+  /^(?:下载(?:文件)?|downloads?)(?:\s*(?:\(\d+\)|（\d+）))?$/i,
 ];
 const OPAQUE_TITLE = /^(?:chatgpt:)?(?:[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}|[0-9a-f]{32})$/i;
 const WINDOWS_RESERVED_NAME = /^(?:con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\..*)?$/i;

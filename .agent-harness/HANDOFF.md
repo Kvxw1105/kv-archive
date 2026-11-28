@@ -6,7 +6,7 @@ Mode: BOOTSTRAPPED → real-browser acceptance (TASK-031)
 
 ## 2026-11-28 — Single-conversation download names
 
-The scoped `codex/chat-title-filenames` candidate changes only the single-chat download name calculation. Local build and 313 deterministic tests passed; installed extension behavior is not verified. No owner data or permissions changed.
+The scoped `codex/chat-title-filenames` candidate changes only the single-chat download name calculation, including `下载 (1)`/Download placeholder detection. A snapshot of a save dialog is evidence of the name shown, not of a loaded build or of which component assigned it. Local build and 314 deterministic tests passed; installed extension behavior is not verified. No owner data or permissions changed.
 
 Next: (1) Review after the parent import candidate; (2) verify an isolated test Chrome downloads HTML, Markdown and ZIP under the expected title; (3) if the reported names are inside a batch export instead, ask for one example filename and investigate that path separately.
 
