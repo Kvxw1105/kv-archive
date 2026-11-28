@@ -10,6 +10,12 @@ CI run: `31276928345` — https://github.com/Kvxw1105/kv-archive/actions/runs/31
 Release: `v0.16.11` pre-release — https://github.com/Kvxw1105/kv-archive/releases/tag/v0.16.11  
 Branch protection: ruleset `main-protection` active (pull_request + non_fast_forward + required `verify` check)
 
+## 2026-11-28 — Single-conversation download names
+
+- Dedicated candidate on `codex/chat-title-filenames`, based on the pending import candidate. HTML, Markdown and ZIP downloads ignore internal chat IDs masquerading as titles and use a real captured or tab title. Untitled fallback no longer exposes an ID in the filename. A user-observed `下载 (1)` save-dialog label prompted explicit coverage for localized download placeholders (including numbered variants); installation and the native dialog still require separate confirmation.
+- Built and tested on a separate Windows worktree: 314/314 deterministic tests. Baseline/replay with a synthetic Chinese title verified the output and byte-exact rollback. No installed extension, database/schema, permissions, existing files, or batch backup format changed.
+
+
 ## 2026-11-27 — TASK-033 official import candidate
 
 - Official ZIP/JSON now has a write-free preview, explicit commit and an exportable per-file receipt. Bad files/entries/records do not hide good entries, and official updates preserve established Project locations.

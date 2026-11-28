@@ -78,6 +78,47 @@ test("export filename falls back to the first user message when provider titles 
   assert.equal(resolveExportTitle({ canonical, raw: {}, tabTitle: "ChatGPT" }), "帮我分析这个开源项目到底有什么门道");
 });
 
+test("an internal ID is not a title when a human-facing chat title is available", () => {
+  const id = "1a6e04fd-37b4-4cbf-a3f1-3659a548c017";
+  const canonical = { conversationId: id, title: `chatgpt:${id}` };
+  const raw = { id, title: id };
+  const title = resolveExportTitle({ canonical, raw, tabTitle: "阳台种薄荷：浇水/剪枝 - ChatGPT", providerDisplayName: "ChatGPT" });
+  assert.equal(title, "阳台种薄荷：浇水/剪枝");
+  const formats = new Map([
+    ["readable-html", "阳台种薄荷：浇水-剪枝.html"],
+    ["markdown", "阳台种薄荷：浇水-剪枝.md"],
+    ["backup-zip", "阳台种薄荷：浇水-剪枝-KV-Archive.zip"],
+  ]);
+  for (const [format, expected] of formats) {
+    assert.equal(buildExportArtifact({ ...base, canonical, raw, format, title }).filename, expected);
+  }
+});
+
+test("keeps a real captured title and never uses an opaque fallback ID", () => {
+  const id = "gpt-title-test-729";
+  const canonical = { conversationId: id, title: id };
+  const raw = { id, title: "真正的对话标题" };
+  const tabTitle = "旧标签页标题 - ChatGPT";
+  assert.equal(resolveExportTitle({ canonical, raw, tabTitle }), raw.title);
+  assert.equal(resolveExportTitle({ canonical, raw: { id }, tabTitle: "ChatGPT", providerDisplayName: "ChatGPT" }), "ChatGPT 对话");
+});
+
+test("uses the chat title instead of localized download labels", () => {
+  const baseInput = {
+    canonical: { conversationId: "qa-chat-1", title: "下载" },
+    raw: { title: "下载 (1)" },
+    tabTitle: "阳台种薄荷：浇水/剪枝 - ChatGPT",
+    providerDisplayName: "ChatGPT",
+  };
+  for (const label of ["下载", "下载 (1)", "下载（1）", "下载文件", "Download", "Downloads (2)"]) {
+    assert.equal(resolveExportTitle({ ...baseInput, canonical: { ...baseInput.canonical, title: label } }), "阳台种薄荷：浇水/剪枝");
+  }
+  const title = resolveExportTitle(baseInput);
+  assert.equal(buildExportArtifact({ ...base, format: "readable-html", title }).filename, "阳台种薄荷：浇水-剪枝.html");
+  assert.equal(resolveExportTitle({ ...baseInput, tabTitle: "Downloads (2)" }), "ChatGPT 对话");
+  assert.equal(resolveExportTitle({ ...baseInput, raw: { title: "如何下载公开资料" } }), "如何下载公开资料");
+});
+
 test("safe export names remain portable on Windows", () => {
   assert.equal(safeExportName('A/B: C*D? "E".'), "A-B- C-D- -E-");
   assert.equal(safeExportName("CON"), "_CON");
