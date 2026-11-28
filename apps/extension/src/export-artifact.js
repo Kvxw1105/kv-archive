@@ -7,6 +7,7 @@ const GENERIC_TITLES = [
   /^(?:untitled conversation|new chat|chatgpt conversation|ai conversation)$/i,
   /^(?:未命名对话|新对话|网页\s*ai\s*对话|ai\s*对话|当前\s*ai\s*对话)$/i,
 ];
+const OPAQUE_TITLE = /^(?:chatgpt:)?(?:[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}|[0-9a-f]{32})$/i;
 const WINDOWS_RESERVED_NAME = /^(?:con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\..*)?$/i;
 
 function cleanText(value) {
@@ -46,6 +47,9 @@ export function resolveExportTitle({ canonical, raw, tabTitle, providerDisplayNa
   const rawRecord = raw && typeof raw === "object" ? raw : {};
   const rawConversation = rawRecord?.conversation && typeof rawRecord.conversation === "object" ? rawRecord.conversation : {};
   const rawMetadata = rawRecord?.metadata && typeof rawRecord.metadata === "object" ? rawRecord.metadata : {};
+  const knownIds = new Set([canonical?.conversationId, rawRecord.id, rawConversation.id]
+    .map((value) => cleanText(value).toLowerCase())
+    .filter(Boolean));
   const candidates = [
     canonical?.title,
     rawRecord.title,
@@ -57,12 +61,11 @@ export function resolveExportTitle({ canonical, raw, tabTitle, providerDisplayNa
   ];
   for (const candidate of candidates) {
     const title = meaningfulTitle(candidate);
-    if (title) return title;
+    if (title && !OPAQUE_TITLE.test(title) && !knownIds.has(title.toLowerCase())) return title;
   }
   const promptTitle = firstUserMessageTitle(canonical);
   if (promptTitle) return promptTitle;
-  const shortId = cleanText(canonical?.conversationId).replace(/[^a-z0-9_-]/gi, "").slice(0, 12);
-  return `${cleanText(providerDisplayName) || "AI"} 对话${shortId ? `-${shortId}` : ""}`;
+  return `${cleanText(providerDisplayName) || "AI"} 对话`;
 }
 
 export function safeExportName(value) {
